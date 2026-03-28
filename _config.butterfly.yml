@@ -145,24 +145,22 @@ index_site_info_top:
 # The height of top_img, eg: 300px/300em/300rem
 index_top_img_height:
 
-# The subtitle on homepage
+# 首页副标题 / 动态打字机效果
 subtitle:
-  enable: false
-  # Typewriter Effect
-  effect: true
-  # Customize typed.js
-  # https://github.com/mattboldt/typed.js/#customization
-  typed_option:
-  # Source - Call the third-party service API (Chinese only)
-  # It will show the source first, then show the content of sub
-  # Choose: false/1/2/3
-  # false - disable the function
-  # 1 - hitokoto.cn
-  # 2 - https://api.aa1.cn/doc/yiyan.html
-  # 3 - jinrishici.com
-  source: false
-  # If you close the typewriter effect, the subtitle will only show the first line of sub
+  enable: true        # 必须设为 true 才能开启
+  effect: true        # 开启打字机动态效果
+  loop: true          # 开启循环播放
+  source: false       # 如果你没有用到一言（Hitokoto）等外部接口，保持 false 即可
+  # 下面是你想要展示的动态文字列表，可以添加多句，它会自动一行行打出来并轮播
   sub:
+    - "Welcome to my blog"
+    - "毎日が楽しい日でありますように !"
+
+# 打字机效果的详细参数（通常保持默认也可以）
+  typed_option:
+    typeSpeed: 70      # 打字速度 (数字越大越慢)
+    backSpeed: 30      # 删除文字的速度
+    backDelay: 2000    # 停顿多久后开始删除上一句 (单位：毫秒)
 
 # Article layout on the homepage
 # 1: Cover on the left, info on the right
@@ -615,7 +613,7 @@ facebook_comments:
 # Twikoo
 # https://github.com/imaegoo/twikoo
 twikoo:
-  envId: https://twikoo-server-roan.vercel.app
+  envId: https://comment.han.tax
   region:
   # Use Twikoo visitor count as the page view count
   visitor: true
