@@ -4,7 +4,7 @@ categories: []
 date: '2026-03-28T20:58:23.497526+08:00'
 tags: []
 title: LM2596+AMS1117两级减压模块
-updated: '2026-03-28T21:47:54.209+08:00'
+updated: '2026-03-28T22:00:47.220+08:00'
 ---
 # LM2596+AMS1117两级减压模块
 
@@ -16,9 +16,9 @@ updated: '2026-03-28T21:47:54.209+08:00'
 **1.第一级（粗调）**： 使用 DC-DC 降压芯片 LM2596，将 24V 高效降至 5V。
 **2.第二级（精调**）： 使用 LDO 线性稳压芯片 AMS1117-3.3，将 5V 平稳滤至 3.3V。
 
-![](https://cdn.jsdelivr.net/gh/lilinhan24-lab/hexo-source@main/test-0329-abcd.png)
+![](https://cdn.jsdelivr.net/gh/lilinhan24-lab/hexo-source@main/ylt.png)
 
-#### ⚙️ 第一级：LM2596 开关降压（干苦力的前锋）
+⚙️ 第一级：LM2596 开关降压（干苦力的前锋）
 
 LM2596 是一款经典的开关型降压（Buck）转换器。它的最大优势在于转换效率极高，在处理 24V 到 5V 这种大压差、大电流任务时，自身发热量相对较小。
 
@@ -39,11 +39,11 @@ LM2596 是一款经典的开关型降压（Buck）转换器。它的最大优势
 大动脉（主功率回路）： 从 24V 输入 ➔ LM2596 ➔ 电感 ➔ 5V ➔ AMS1117 的走线，跑的都是大电流，线宽建议至少设置在 40mil 以上。
 侦察兵（信号线）： 比如 LM2596 的 FB 反馈线，它只负责读取电压信号，电流极小，使用 15mil 的细线即可，但要注意避开电感等强干扰源。
 
-![](https://cdn.jsdelivr.net/gh/lilinhan24-lab/hexo-source@main/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE%202026-03-28%20203507.png)
+![](https://cdn.jsdelivr.net/gh/lilinhan24-lab/hexo-source@main/pcb.png)
 
 2.极性元件的“生死核对”： 贴片铝电解电容是极板杀手。一定要在 3D 预览模式下反复核对：电容顶部的黑色/红色色块标记通常代表负极。如果把它的负极焊盘错连到了 VCC 上，通电瞬间就会喜提“放鞭炮”体验。
 
-![](https://cdn.jsdelivr.net/gh/lilinhan24-lab/hexo-source@main/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE%202026-03-28%20203535.png)
+![](https://cdn.jsdelivr.net/gh/lilinhan24-lab/hexo-source@main/sd.png)
 
 3.散热与抗干扰的终极大招：
 热过孔： 在 LM2596 和 AMS1117 背部的大面积散热焊盘上，打上几个（0.3mm左右）的过孔，将热量导到板子背面。
