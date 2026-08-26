@@ -5,12 +5,10 @@ type: "talks"
 layout: "talks"
 aside: false
 ---
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/qexo-static@1.5.0/hexo/talks.min.css">
-<script src="https://cdn.jsdelivr.net/npm/qexo-static@1.5.0/hexo/talks.min.js"></script>
-<div id="qexot" role="feed" aria-live="polite">
-  <p class="han-talks-status">正在加载说说……</p>
+<div id="qexot" role="feed" aria-live="polite" data-endpoint="https://api.han.tax/pub/talks/?page=1&limit=5">
+  <p class="han-talks-status">这里暂时还没有说说，过一阵再来看看吧。</p>
 </div>
 <noscript>
-  <p class="han-talks-status">需要启用 JavaScript 才能查看说说。</p>
+  <p class="han-talks-status">这里暂时还没有说说，过一阵再来看看吧。</p>
 </noscript>
-<script src="/js/talks-status.js"></script>
+<script src="/js/talks-status.js" defer></script>

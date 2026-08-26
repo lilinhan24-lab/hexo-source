@@ -95,7 +95,10 @@ async function runBrowserChecks() {
   await page.waitForLoadState('load')
   await page.locator('#search-button > .search').waitFor({ state: 'visible' })
   assert(await page.locator('.han-skip-link').count() === 1, '首页缺少跳转到主要内容链接')
-  assert(await page.locator('a[href="/atom.xml"]').count() > 0, '首页缺少 RSS 订阅入口')
+  assert(await page.locator('#site_social_icons a[href="/atom.xml"]').count() === 0, '首页仍显示 RSS 图标')
+  assert(await page.locator('#recent-posts .post_cover').count() === 0, '首页仍显示文章封面')
+  assert(await page.locator('link[rel="preload"][href="/img/banner-desktop.jpg"]').count() === 1, '首页缺少桌面背景预加载')
+  assert(await page.locator('link[rel="preload"][href="/img/banner-mobile.jpg"]').count() === 1, '首页缺少移动端背景预加载')
 
   await page.keyboard.press(process.platform === 'darwin' ? 'Meta+K' : 'Control+K')
   await page.locator('#local-search .local-search-input input').waitFor({ state: 'visible' })
@@ -127,17 +130,17 @@ async function runBrowserChecks() {
   await page.route('https://api.han.tax/pub/talks/**', route => route.fulfill({
     status: 200,
     contentType: 'application/json',
-    body: JSON.stringify({ status: true, count: 0, data: [] })
-  }))
-  await page.route('https://cdn.jsdelivr.net/npm/qexo-static@1.5.0/hexo/talks.min.js', route => route.fulfill({
-    status: 200,
-    contentType: 'application/javascript',
-    body: "function showQexoTalks(id){document.getElementById(id).innerHTML='<section class=\"qexot\"><div class=\"qexot-list\"></div></section>'}"
+    body: JSON.stringify({
+      status: true,
+      count: 1,
+      data: [{ id: 'smoke', content: 'Browser smoke test', time: Date.now(), tags: ['test'], like: 0 }]
+    })
   }))
   await page.goto(new URL('/talks/', siteUrl).href, { waitUntil: 'domcontentloaded' })
-  await page.waitForTimeout(1_000)
+  assert(await page.locator('.qexo_loading').count() === 0, '说说页面仍显示外部转圈动画')
+  await page.locator('.han-talk-item').waitFor({ state: 'visible' })
   const talksText = await page.locator('#qexot').innerText()
-  assert(talksText.includes('这里暂时还没有说说'), `说说空状态未正确显示，实际内容：${talksText}`)
+  assert(talksText.includes('Browser smoke test'), `说说后台更新未正确显示，实际内容：${talksText}`)
 
   assert(pageErrors.length === 0, `页面 JavaScript 错误：${pageErrors.join(' | ')}`)
   await context.close()
@@ -148,7 +151,7 @@ try {
   await startServerIfNeeded()
   await checkGeneratedEndpoints()
   await runBrowserChecks()
-  console.log('浏览器功能检查通过：搜索、RSS、文章阅读信息、移动端、404 与说说空状态均正常。')
+  console.log('浏览器功能检查通过：搜索、无封面首页、背景预加载、文章阅读信息、移动端、404 与说说后台更新均正常。')
 } finally {
   if (serverProcess && !serverProcess.killed) serverProcess.kill()
 }

@@ -35,6 +35,10 @@ html {
   cursor: pointer;
 }
 
+#page-header {
+  background-color: #476b40 !important;
+}
+
 .article-meta-wrap,
 .article-meta-wrap a,
 .aside-list-item time {
@@ -69,14 +73,45 @@ html {
   text-align: center;
 }
 
-.han-talks-status button {
-  margin-left: 0.5rem;
-  padding: 0.35rem 0.8rem;
-  border: 0;
-  border-radius: 6px;
-  background: #49b1f5;
-  color: #fff;
-  cursor: pointer;
+.han-talk-list {
+  display: grid;
+  gap: 1rem;
+}
+
+.han-talk-item {
+  padding: 1rem 1.1rem;
+  border: 1px solid rgb(73 177 245 / 20%);
+  border-radius: 12px;
+  background: var(--card-bg, #fff);
+  box-shadow: 0 4px 14px rgb(0 0 0 / 6%);
+}
+
+.han-talk-meta,
+.han-talk-footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  color: var(--han-meta-color);
+  font-size: 0.85rem;
+}
+
+.han-talk-content {
+  margin: 0.75rem 0;
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.han-talk-content > :first-child {
+  margin-top: 0;
+}
+
+.han-talk-content > :last-child {
+  margin-bottom: 0;
+}
+
+.han-talk-tag {
+  color: #49b1f5;
 }
 
 @media (max-width: 768px) {

@@ -64,6 +64,9 @@ for (const file of sourceFiles) {
     if (content.includes('cdn.jsdelivr.net/gh/lilinhan24-lab/hexo-source')) {
       problems.push(`文章图片仍依赖源码仓库 CDN: ${path.relative(projectRoot, file)}`)
     }
+    if (content.includes('qexo-static')) {
+      problems.push(`说说页面仍依赖外部转圈组件: ${path.relative(projectRoot, file)}`)
+    }
   }
 }
 
@@ -90,6 +93,10 @@ for (const htmlFile of htmlFiles) {
 
   if (html.includes('http://example.com')) {
     problems.push(`生成页面仍包含示例域名: public/${relativeHtml}`)
+  }
+
+  if (html.includes('[object Object]')) {
+    problems.push(`生成页面包含无效的配置注入结果: public/${relativeHtml}`)
   }
 
   for (const match of html.matchAll(attributePattern)) {

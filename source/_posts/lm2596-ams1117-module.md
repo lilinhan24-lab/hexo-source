@@ -4,7 +4,6 @@ date: 2026-03-28 20:58:23
 updated: 2026-03-29 11:26:00
 permalink: posts/lm2596-ams1117/
 description: 使用 LM2596 将 24V 高效降至 5V，再通过 AMS1117 输出 3.3V，并总结原理图、PCB 布局和散热设计要点。
-cover: /images/posts/lm2596-ams1117/cover.jpg
 categories:
   - 技术笔记
 tags:

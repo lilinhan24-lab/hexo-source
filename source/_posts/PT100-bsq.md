@@ -4,7 +4,6 @@ date: 2026-04-02 11:32:24
 updated: 2026-04-03 14:05:10
 permalink: posts/pt100-transmitter/
 description: 从三线制 PT100、浮地基准恒流源到 20 倍差分放大，完整复盘一款适配 GD32 ADC 的高精度温度变送器设计。
-cover: /images/posts/pt100-transmitter/cover.jpg
 categories:
   - 技术笔记
 tags:
