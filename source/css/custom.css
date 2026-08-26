@@ -1,0 +1,98 @@
+:root {
+  --han-meta-color: #666;
+  --han-footer-bg: #24566f;
+  --han-focus-color: #ff7242;
+}
+
+html {
+  scroll-padding-top: 80px;
+}
+
+.han-skip-link {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 10000;
+  padding: 10px 16px;
+  border-radius: 8px;
+  background: #fff;
+  color: #1f2d3d;
+  box-shadow: 0 4px 16px rgb(0 0 0 / 20%);
+  transform: translateY(-160%);
+  transition: transform 0.2s ease;
+}
+
+.han-skip-link:focus {
+  transform: translateY(0);
+}
+
+:where(a, button, input, [role='button']):focus-visible {
+  outline: 3px solid var(--han-focus-color);
+  outline-offset: 3px;
+}
+
+#search-button > .search[role='button'] {
+  cursor: pointer;
+}
+
+.article-meta-wrap,
+.article-meta-wrap a,
+.aside-list-item time {
+  color: var(--han-meta-color) !important;
+}
+
+#footer {
+  background: var(--han-footer-bg);
+}
+
+#footer,
+#footer a,
+#footer .framework-info,
+#footer .copyright {
+  color: #fff !important;
+}
+
+#page-header.full_page {
+  min-height: 520px;
+}
+
+#page-header.full_page #site_social_icons i {
+  color: #fff !important;
+}
+
+.han-talks-status {
+  margin: 1rem 0;
+  padding: 1rem 1.25rem;
+  border: 1px solid rgb(73 177 245 / 25%);
+  border-radius: 10px;
+  background: rgb(73 177 245 / 8%);
+  text-align: center;
+}
+
+.han-talks-status button {
+  margin-left: 0.5rem;
+  padding: 0.35rem 0.8rem;
+  border: 0;
+  border-radius: 6px;
+  background: #49b1f5;
+  color: #fff;
+  cursor: pointer;
+}
+
+@media (max-width: 768px) {
+  #page-header.full_page {
+    min-height: 480px;
+    background-image: url('/img/banner-mobile.jpg') !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

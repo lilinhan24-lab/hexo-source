@@ -1,13 +1,19 @@
 ---
-abbrlink: ''
+title: 高精度 PT100 变送器：三线制恒流源与差分放大设计
+date: 2026-04-02 11:32:24
+updated: 2026-04-03 14:05:10
+permalink: posts/pt100-transmitter/
+description: 从三线制 PT100、浮地基准恒流源到 20 倍差分放大，完整复盘一款适配 GD32 ADC 的高精度温度变送器设计。
+cover: /images/posts/pt100-transmitter/cover.jpg
 categories:
-- - 技术笔记
-date: '2026-04-02T11:32:24.532705+08:00'
-tags: []
-title: 高精度PT100变送器
-updated: '2026-04-03T14:05:10.899+08:00'
+  - 技术笔记
+tags:
+  - PT100
+  - 模拟电路
+  - PCB
+  - GD32
+mathjax: true
 ---
-# 高精度PT100变送器
 
 ## 前言：
 
@@ -62,7 +68,7 @@ updated: '2026-04-03T14:05:10.899+08:00'
 
 ---
 
-![](https://cdn.jsdelivr.net/gh/lilinhan24-lab/hexo-source@main/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE%202026-04-01%20221855.png)
+![PT100 变送器原理图](/images/posts/pt100-transmitter/schematic.png)
 
 ## 二、 恒流源设计：巧妙的浮地基准
 
@@ -127,9 +133,9 @@ $$
 3. **退耦贴片：** 所有的 100nF 滤波电容必须以最短的物理距离贴紧芯片 VCC 引脚。
 4. **全板铺地与缝合孔：** 顶层与底层进行大面积 GND 铺铜，并均匀打上缝合过孔，形成“防弹铁布衫”，彻底屏蔽外界电磁干扰。
 
-   ![](https://cdn.jsdelivr.net/gh/lilinhan24-lab/hexo-source@main/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE%202026-04-01%20221835.png)
+   ![PT100 变送器 PCB 布局](/images/posts/pt100-transmitter/pcb-layout.png)
 
-![](https://cdn.jsdelivr.net/gh/lilinhan24-lab/hexo-source@main/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE%202026-04-01%20221929.png)
+![PT100 变送器 PCB 三维预览](/images/posts/pt100-transmitter/pcb-3d-preview.png)
 
 ## 六、 总结与下一步计划
 
@@ -140,5 +146,3 @@ $$
 > **💡 避坑建议：** 焊接时务必注意 LM385 和 SOT-89 封装三极管的实物管脚定义，切勿盲目迷信通用数据手册，一切以实测为准！
 
 欢迎在评论区留言交流，或者在我的博客探索更多关于硬件与代码的硬核实操！
-
-<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>

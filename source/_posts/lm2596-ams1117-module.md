@@ -1,13 +1,18 @@
 ---
-abbrlink: ''
+title: LM2596 + AMS1117 两级降压模块设计
+date: 2026-03-28 20:58:23
+updated: 2026-03-29 11:26:00
+permalink: posts/lm2596-ams1117/
+description: 使用 LM2596 将 24V 高效降至 5V，再通过 AMS1117 输出 3.3V，并总结原理图、PCB 布局和散热设计要点。
+cover: /images/posts/lm2596-ams1117/cover.jpg
 categories:
-- - 技术笔记
-date: '2026-03-28T20:58:23.497526+08:00'
-tags: []
-title: LM2596+AMS1117两级减压模块
-updated: '2026-03-29T11:26:00.478+08:00'
+  - 技术笔记
+tags:
+  - LM2596
+  - AMS1117
+  - 电源设计
+  - PCB
 ---
-# LM2596+AMS1117两级减压模块
 
 #### **前言：为什么我们要“两级跳”？**
 
@@ -17,7 +22,7 @@ updated: '2026-03-29T11:26:00.478+08:00'
 **1.第一级（粗调）**： 使用 DC-DC 降压芯片 LM2596，将 24V 高效降至 5V。
 **2.第二级（精调**）： 使用 LDO 线性稳压芯片 AMS1117-3.3，将 5V 平稳滤至 3.3V。
 
-![](https://cdn.jsdelivr.net/gh/lilinhan24-lab/hexo-source@main/ylt.png)
+![LM2596 与 AMS1117 两级降压原理图](/images/posts/lm2596-ams1117/schematic.png)
 
 #### ⚙️ 第一级：LM2596 开关降压（干苦力的前锋）
 
@@ -40,11 +45,11 @@ LM2596 是一款经典的开关型降压（Buck）转换器。它的最大优势
 大动脉（主功率回路）： 从 24V 输入 ➔ LM2596 ➔ 电感 ➔ 5V ➔ AMS1117 的走线，跑的都是大电流，线宽建议至少设置在 40mil 以上。
 侦察兵（信号线）： 比如 LM2596 的 FB 反馈线，它只负责读取电压信号，电流极小，使用 15mil 的细线即可，但要注意避开电感等强干扰源。
 
-![](https://cdn.jsdelivr.net/gh/lilinhan24-lab/hexo-source@main/pcb.png)
+![LM2596 与 AMS1117 两级降压模块 PCB 布局](/images/posts/lm2596-ams1117/pcb-layout.png)
 
 2.极性元件的“生死核对”： 贴片铝电解电容是极板杀手。一定要在 3D 预览模式下反复核对：电容顶部的黑色/红色色块标记通常代表负极。如果把它的负极焊盘错连到了 VCC 上，通电瞬间就会喜提“放鞭炮”体验。
 
-![](https://cdn.jsdelivr.net/gh/lilinhan24-lab/hexo-source@main/sd.png)
+![LM2596 与 AMS1117 两级降压模块三维预览](/images/posts/lm2596-ams1117/pcb-3d-preview.png)
 
 3.散热与抗干扰的终极大招：
 热过孔： 在 LM2596 和 AMS1117 背部的大面积散热焊盘上，打上几个（0.3mm左右）的过孔，将热量导到板子背面。
