@@ -4,8 +4,8 @@
 
 # Site
 title: 函的极客笔记
-subtitle: 逆水行舟，不进则退
-description: 分享嵌入式系统、模拟电路、PCB 设计与工程实践的个人技术博客。
+subtitle: 嵌入式硬件学习与工程实践
+description: 记录嵌入式硬件学习与项目实践，分享模拟电路、电源设计、传感器采集、PCB 设计与调试复盘。
 author: Shout
 language: zh-CN
 timezone: Asia/Shanghai
