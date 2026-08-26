@@ -11,4 +11,4 @@ aside: false
 <noscript>
   <p class="han-talks-status">这里暂时还没有说说，过一阵再来看看吧。</p>
 </noscript>
-<script src="/js/talks-status.js" defer></script>
+<script src="/js/talks-status.js?v=20260826-2" defer></script>

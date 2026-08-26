@@ -1054,7 +1054,7 @@ inject:
   head:
     - '<link rel="preload" href="/img/banner-desktop.jpg" as="image" fetchpriority="high" media="(min-width: 769px)">'
     - '<link rel="preload" href="/img/banner-mobile.jpg" as="image" fetchpriority="high" media="(max-width: 768px)">'
-    - <link rel="stylesheet" href="/css/custom.css">
+    - <link rel="stylesheet" href="/css/custom.css?v=20260826-2">
   bottom:
     - <script src="/js/site-enhancements.js" defer></script>
 
