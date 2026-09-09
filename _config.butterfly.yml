@@ -19,6 +19,7 @@ nav:
 
 menu:
   首页: / || fas fa-home
+  文章: /archives/ || fas fa-archive
   关于: /about/ || fas fa-heart
   说说: /talks/ || fa-solid fa-comment-dots
 
@@ -286,7 +287,7 @@ aside:
     enable: true
     content: 记录嵌入式硬件学习、项目、比赛与工程复盘
   card_recent_post:
-    enable: false
+    enable: true
     # If set 0 will show all
     limit: 5
     # Sort: date / updated

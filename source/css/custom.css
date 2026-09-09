@@ -71,6 +71,10 @@ html {
   display: none;
 }
 
+#sidebar-menus .site-data {
+  display: none;
+}
+
 .han-motto {
   display: inline-block;
   margin-top: 0.55rem;

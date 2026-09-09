@@ -42,9 +42,7 @@ hexo.extend.generator.register('zero-content-pages', function zeroContentPages(l
   ]
 })
 
-hexo.extend.filter.register('after_render:html', function removeEmptyTaxonomyCounters(html) {
-  if (hexo.locals.get('posts').length > 0) return html
-
+hexo.extend.filter.register('after_render:html', function removeHiddenTaxonomyCounters(html) {
   return html.replace(
     /<div class="site-data(?: text-center)?">.*?<\/a><\/div>/gs,
     ''
