@@ -1,6 +1,6 @@
 :root {
   --han-meta-color: #666;
-  --han-footer-bg: #24566f;
+  --han-footer-bg: #083f6b;
   --han-focus-color: #ff7242;
 }
 
@@ -36,7 +36,9 @@ html {
 }
 
 #page-header {
-  background-color: #476b40 !important;
+  background-color: #0b4f87 !important;
+  background-position: center center !important;
+  background-size: cover !important;
 }
 
 .article-meta-wrap,
@@ -58,6 +60,15 @@ html {
 
 #page-header.full_page {
   min-height: 520px;
+}
+
+#page-header #site-title,
+#page-header #site-subtitle {
+  text-shadow: 0 2px 10px rgb(0 35 75 / 55%);
+}
+
+#aside-content .card-info .site-data {
+  display: none;
 }
 
 #page-header.full_page #site_social_icons i {
@@ -117,7 +128,9 @@ html {
 @media (max-width: 768px) {
   #page-header.full_page {
     min-height: 480px;
-    background-image: url('/img/banner-mobile.jpg') !important;
+    background-image: url('/img/banner-glacier.jpg') !important;
+    background-position: center center !important;
+    background-size: cover !important;
   }
 }
 

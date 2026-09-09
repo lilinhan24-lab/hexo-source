@@ -1,21 +1,4 @@
 {
-  "redirects": [
-    {
-      "source": "/2026/03/28/lm2596-ams1117-module.md/",
-      "destination": "/posts/lm2596-ams1117/",
-      "permanent": true
-    },
-    {
-      "source": "/2026/04/01/PT100-bsq/",
-      "destination": "/posts/pt100-transmitter/",
-      "permanent": true
-    },
-    {
-      "source": "/2026/04/02/PT100-bsq/",
-      "destination": "/posts/pt100-transmitter/",
-      "permanent": true
-    }
-  ],
   "headers": [
     {
       "source": "/(.*)",

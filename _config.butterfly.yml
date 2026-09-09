@@ -19,9 +19,6 @@ nav:
 
 menu:
   首页: / || fas fa-home
-  归档: /archives/ || fas fa-archive
-  标签: /tags/ || fas fa-tags
-  分类: /categories/ || fas fa-folder-open
   关于: /about/ || fas fa-heart
   说说: /talks/ || fa-solid fa-comment-dots
 
@@ -44,14 +41,13 @@ code_blocks:
 # Formal:
 #   icon: link || the description || color
 social:
-  fab fa-github: https://github.com/lilinhan24-lab || GitHub || '#24292e'
   # fas fa-envelope: mailto:xxxxxx@gmail.com || Email || '#4a7dbe'
 
 # --------------------------------------
 # Image Settings
 # --------------------------------------
 
-favicon: /img/favicon.ico
+favicon: /img/avatar-256.jpg
 
 avatar:
   img: /img/avatar-256.jpg
@@ -61,10 +57,10 @@ avatar:
 disable_top_img: false
 
 # If the banner of page not setting, it will show the default_top_img
-default_top_img: /img/banner-desktop.jpg
+default_top_img: /img/banner-glacier.jpg
 
 # The banner image of index page
-index_img: /img/banner-desktop.jpg
+index_img: /img/banner-glacier.jpg
 
 # The banner image of archive page
 archive_img:
@@ -275,22 +271,22 @@ aside:
   # Position: left / right
   position: right
   display:
-    archive: true
-    tag: true
-    category: true
+    archive: false
+    tag: false
+    category: false
   card_author:
     enable: true
     description:
     button:
-      enable: true
-      icon: fab fa-github
-      text: 查看 GitHub
-      link: https://github.com/lilinhan24-lab
+      enable: false
+      icon:
+      text:
+      link:
   card_announcement:
     enable: true
-    content: 分享嵌入式系统、模拟电路与 PCB 设计实践
+    content: 记录嵌入式硬件学习、项目、比赛与工程复盘
   card_recent_post:
-    enable: true
+    enable: false
     # If set 0 will show all
     limit: 5
     # Sort: date / updated
@@ -304,14 +300,14 @@ aside:
     storage: 10
     avatar: true
   card_categories:
-    enable: true
+    enable: false
     # If set 0 will show all
     limit: 8
     # Choose: none / true / false
     expand: none
     sort_order:
   card_tags:
-    enable: true
+    enable: false
     # If set 0 will show all
     limit: 40
     color: false
@@ -322,7 +318,7 @@ aside:
     order: 1
     sort_order:
   card_archives:
-    enable: true
+    enable: false
     # Type: monthly / yearly
     type: monthly
     # Eg: YYYY年MM月
@@ -333,7 +329,7 @@ aside:
     limit: 8
     sort_order:
   card_post_series:
-    enable: true
+    enable: false
     # The title shows the series name
     series_title: false
     # Order by title or date
@@ -341,7 +337,7 @@ aside:
     # Sort of order. 1, asc for ascending; -1, desc for descending
     order: -1
   card_webinfo:
-    enable: true
+    enable: false
     post_count: true
     last_push_date: true
     sort_order:
@@ -508,7 +504,7 @@ search:
 share:
   # Choose: sharejs / addtoany
   # Leave it empty if you don't need share
-  use: sharejs
+  use:
 
   # Share.js
   # https://github.com/overtrue/share.js
@@ -1043,7 +1039,8 @@ structured_data:
   # Format: ['name1', 'name2']
   alternate_name:
     - han.tax
-    - 函的极客笔记
+    - 小小林的个人博客
+    - 硬件小小林
 
 # Add the vendor prefixes to ensure compatibility
 css_prefix: true
@@ -1052,9 +1049,9 @@ css_prefix: true
 # Insert the code to head (before '</head>' tag) and the bottom (before '</body>' tag)
 inject:
   head:
-    - '<link rel="preload" href="/img/banner-desktop.jpg" as="image" fetchpriority="high" media="(min-width: 769px)">'
-    - '<link rel="preload" href="/img/banner-mobile.jpg" as="image" fetchpriority="high" media="(max-width: 768px)">'
-    - <link rel="stylesheet" href="/css/custom.css?v=20260826-2">
+    - '<link rel="preload" href="/img/banner-glacier.jpg" as="image" fetchpriority="high">'
+    - '<link rel="alternate" href="/atom.xml" title="小小林的个人博客" type="application/atom+xml">'
+    - <link rel="stylesheet" href="/css/custom.css?v=20260909-1">
   bottom:
     - <script src="/js/site-enhancements.js" defer></script>
 
