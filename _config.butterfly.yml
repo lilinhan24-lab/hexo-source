@@ -276,7 +276,7 @@ aside:
     category: false
   card_author:
     enable: true
-    description:
+    description: '专注嵌入式硬件学习与工程实践<br><span class="han-motto">逆水行舟，不进则退</span>'
     button:
       enable: false
       icon:
@@ -1051,7 +1051,7 @@ inject:
   head:
     - '<link rel="preload" href="/img/banner-glacier.jpg" as="image" fetchpriority="high">'
     - '<link rel="alternate" href="/atom.xml" title="小小林的个人博客" type="application/atom+xml">'
-    - <link rel="stylesheet" href="/css/custom.css?v=20260909-1">
+    - <link rel="stylesheet" href="/css/custom.css?v=20260909-2">
   bottom:
     - <script src="/js/site-enhancements.js" defer></script>
 

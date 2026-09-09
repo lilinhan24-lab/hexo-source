@@ -71,6 +71,14 @@ html {
   display: none;
 }
 
+.han-motto {
+  display: inline-block;
+  margin-top: 0.55rem;
+  font-size: 0.9em;
+  letter-spacing: 0.08em;
+  opacity: 0.78;
+}
+
 #page-header.full_page #site_social_icons i {
   color: #fff !important;
 }
