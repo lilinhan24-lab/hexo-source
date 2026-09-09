@@ -3,10 +3,10 @@
 ## Source: https://github.com/hexojs/hexo/
 
 # Site
-title: 函的极客笔记
+title: 小小林的个人博客
 subtitle: 嵌入式硬件学习与工程实践
-description: 记录嵌入式硬件学习与项目实践，分享模拟电路、电源设计、传感器采集、PCB 设计与调试复盘。
-author: Shout
+description: 硬件小小林的个人技术博客，记录嵌入式硬件学习、项目实践、竞赛经历与工程复盘。
+author: 硬件小小林
 language: zh-CN
 timezone: Asia/Shanghai
 
