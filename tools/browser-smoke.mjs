@@ -270,6 +270,14 @@ async function runBrowserChecks() {
 async function checkPowerArticle(page, viewportName) {
   await page.goto(new URL(powerPostPath, siteUrl).href, { waitUntil: 'load' })
   assert(await page.locator('.post-title').innerText() === powerPostTitle, '电源文章标题不正确')
+  const titleState = await page.locator('.post-title').evaluate(el => ({
+    clamp: getComputedStyle(el).webkitLineClamp,
+    clipped: el.scrollHeight > el.clientHeight + 1,
+    top: el.getBoundingClientRect().top,
+    bottom: el.getBoundingClientRect().bottom,
+    headerBottom: document.querySelector('#page-header').getBoundingClientRect().bottom
+  }))
+  assert(titleState.clamp === 'none' && !titleState.clipped && titleState.top >= 60 && titleState.bottom <= titleState.headerBottom, `文章标题被截断或超出标题区：${JSON.stringify(titleState)}`)
   assert(await page.locator('#article-container h1').count() === 0, '电源文章正文重复了主标题')
   assert(await page.locator('#article-container h2').first().innerText() === '前言', '前言标题不是两个字')
   assert(await page.locator('#article-container h2').count() === 6, '电源文章章节数量不正确')

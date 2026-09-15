@@ -25,6 +25,32 @@ html {
   line-height: 1.6;
 }
 
+#post-info .post-title {
+  display: block;
+  overflow: visible;
+  -webkit-line-clamp: unset;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 768px) {
+  #page-header.post-bg {
+    height: auto;
+    min-height: 360px;
+  }
+
+  #page-header.post-bg #post-info {
+    position: relative;
+    top: auto;
+    bottom: auto;
+    padding: 100px 0 30px;
+    transform: none;
+  }
+
+  #post-info .post-title {
+    font-size: 28px;
+  }
+}
+
 @media (max-width: 600px) {
   #post #article-container > h2 {
     font-size: 26px;
