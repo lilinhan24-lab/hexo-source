@@ -188,7 +188,7 @@ const requiredHomeMarkers = [
   ['键盘与无障碍增强脚本', '/js/site-enhancements.js'],
   ['电源文章标题', powerPostTitle],
   ['电源文章地址', powerPostPath],
-  ['新版自定义样式', '/css/custom.css?v=20260915-4']
+  ['新版自定义样式', '/css/custom.css?v=20260915-5']
 ]
 
 for (const [label, marker] of requiredHomeMarkers) {

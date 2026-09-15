@@ -81,11 +81,13 @@ html {
 
 #article-container .han-equation .katex-display {
   margin: 0;
-  text-align: left;
+  width: max-content;
+  min-width: 100%;
+  text-align: center;
 }
 
 #article-container .han-equation .katex-display > .katex {
-  text-align: left;
+  text-align: center;
 }
 
 #article-container .han-equation .katex {

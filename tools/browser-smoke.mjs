@@ -341,6 +341,14 @@ async function checkPowerArticle(page, viewportName) {
     error: Boolean(el.querySelector('.katex-error'))
   })))
   assert(mathState.every(item => item.rendered && !item.error && item.width <= item.articleWidth + 1 && item.overflowX === 'auto'), `公式样式或手机宽度异常：${JSON.stringify(mathState)}`)
+  const alignment = await equations.evaluateAll(items => items.map(el => {
+    const box = el.getBoundingClientRect()
+    const parts = [...el.querySelectorAll('.katex-html > .katex-base')].map(part => part.getBoundingClientRect())
+    const left = Math.min(...parts.map(rect => rect.left))
+    const right = Math.max(...parts.map(rect => rect.right))
+    return { fits: el.scrollWidth <= el.clientWidth + 1, offset: Math.abs((left + right - box.left - box.right) / 2) }
+  }))
+  assert(alignment.every(item => !item.fits || item.offset < 2), `独立公式未居中：${JSON.stringify(alignment)}`)
   if (screenshotDirectory) {
     await equations.nth(1).scrollIntoViewIfNeeded()
     await equations.nth(1).screenshot({ path: path.join(screenshotDirectory, `han-tax-equation-${viewportName}.png`) })
