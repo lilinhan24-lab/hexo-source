@@ -131,10 +131,11 @@ async function runBrowserChecks() {
     assert(await page.locator('.card-categories, .card-tags, .card-archives, .card-webinfo').count() === 0, '首页仍显示暂未启用的侧栏卡片')
 
     const navItems = page.locator('#menus .menus_items > .menus_item > a.site-page')
-    assert(await navItems.count() === 4, `桌面导航数量不是 4，实际为 ${await navItems.count()}`)
+    assert(await navItems.count() === 5, `桌面导航数量不是 5，实际为 ${await navItems.count()}`)
     const navText = (await navItems.allInnerTexts()).map(text => text.trim())
-    assert(JSON.stringify(navText) === JSON.stringify(['首页', '文章', '关于', '说说']), `桌面导航不正确：${navText.join(' / ')}`)
-    assert(await page.locator('#menus a[href="/tags/"], #menus a[href="/categories/"]').count() === 0, '桌面导航出现分类或标签入口')
+    assert(JSON.stringify(navText) === JSON.stringify(['首页', '文章', '文章分类', '关于', '说说']), `桌面导航不正确：${navText.join(' / ')}`)
+    assert(await page.locator('#menus a[href="/categories/"]').count() === 1, '桌面导航缺少分类入口')
+    assert(await page.locator('#menus a[href="/tags/"]').count() === 0, '桌面导航出现未启用的标签入口')
 
     assert(await page.locator('link[rel="preload"][href="/img/banner-glacier.jpg"]').count() === 1, '首页冰川背景预加载数量不是 1')
     assert(await page.locator('link[rel="preload"][href*="banner-desktop"], link[rel="preload"][href*="banner-mobile"]').count() === 0, '首页仍预加载旧背景')
@@ -197,6 +198,8 @@ async function runBrowserChecks() {
     if (screenshotDirectory) await page.screenshot({ path: path.join(screenshotDirectory, 'han-tax-article-desktop.png'), fullPage: true })
 
     await checkPowerArticle(page, 'desktop')
+    await page.locator('#menus a[href="/categories/"]').click()
+    await checkCategories(page, 'desktop')
 
     await page.goto(new URL('/about/', siteUrl).href, { waitUntil: 'domcontentloaded' })
     const aboutText = await page.locator('#article-container').innerText()
@@ -226,8 +229,9 @@ async function runBrowserChecks() {
     assert(mobileState.headerHeight >= 480, `移动端首屏高度不足 480px：${mobileState.headerHeight}px`)
     assert(await mobilePage.locator('#sidebar-menus .site-data').count() === 0, '手机菜单仍包含文章、标签或分类数字')
     const mobileNavText = (await mobilePage.locator('#sidebar-menus .menus_item > a.site-page').allInnerTexts()).map(text => text.trim())
-    assert(JSON.stringify(mobileNavText) === JSON.stringify(['首页', '文章', '关于', '说说']), `手机导航不正确：${mobileNavText.join(' / ')}`)
-    assert(await mobilePage.locator('#sidebar-menus a[href="/tags/"], #sidebar-menus a[href="/categories/"]').count() === 0, '手机菜单出现分类或标签入口')
+    assert(JSON.stringify(mobileNavText) === JSON.stringify(['首页', '文章', '文章分类', '关于', '说说']), `手机导航不正确：${mobileNavText.join(' / ')}`)
+    assert(await mobilePage.locator('#sidebar-menus a[href="/categories/"]').count() === 1, '手机菜单缺少分类入口')
+    assert(await mobilePage.locator('#sidebar-menus a[href="/tags/"]').count() === 0, '手机菜单出现未启用的标签入口')
     if (screenshotDirectory) await mobilePage.screenshot({ path: path.join(screenshotDirectory, 'han-tax-home-mobile.png'), fullPage: true })
 
     await mobilePage.goto(new URL(welcomePostPath, siteUrl).href, { waitUntil: 'domcontentloaded' })
@@ -240,6 +244,9 @@ async function runBrowserChecks() {
     assert(mobileArticleState.headingRights.every(right => right <= mobileArticleState.innerWidth + 1), '移动端三级标题超出屏幕')
     if (screenshotDirectory) await mobilePage.screenshot({ path: path.join(screenshotDirectory, 'han-tax-article-mobile.png'), fullPage: true })
     await checkPowerArticle(mobilePage, 'mobile')
+    await mobilePage.locator('#toggle-menu').click()
+    await mobilePage.locator('#sidebar-menus a[href="/categories/"]').click()
+    await checkCategories(mobilePage, 'mobile')
     await mobileContext.close()
 
     await page.goto(new URL('/404.html', siteUrl).href, { waitUntil: 'domcontentloaded' })
@@ -265,6 +272,18 @@ async function runBrowserChecks() {
   } finally {
     await browser.close()
   }
+}
+
+async function checkCategories(page, viewportName) {
+  await page.waitForURL(new URL('/categories/', siteUrl).href)
+  const categoryLink = page.locator('.category-list-link', { hasText: '硬件设计' })
+  assert(await categoryLink.count() === 1, '分类汇总页缺少硬件设计分类')
+  assert(await page.locator('#post-comment').count() === 0, '分类汇总页不应加载评论')
+  assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), '分类页横向溢出')
+  if (screenshotDirectory) await page.screenshot({ path: path.join(screenshotDirectory, `han-tax-categories-${viewportName}.png`), fullPage: true })
+  await categoryLink.click()
+  await page.waitForURL(url => decodeURIComponent(url.pathname) === '/categories/硬件设计/')
+  assert(await page.locator(`a[href="${powerPostPath}"]`).count() > 0, '分类详情页缺少对应文章')
 }
 
 async function checkPowerArticle(page, viewportName) {

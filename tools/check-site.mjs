@@ -19,6 +19,7 @@ const requiredOutputs = [
   'about/index.html',
   'talks/index.html',
   'archives/index.html',
+  'categories/index.html',
   'posts/welcome-and-roadmap/index.html',
   'posts/lm2596-ams1117-design/index.html',
   'images/posts/lm2596-ams1117-design/schematic.png',
@@ -50,8 +51,7 @@ const forbiddenOutputs = [
   'images/posts/pt100-transmitter/pcb-3d-preview.png',
   'img/banner-desktop.jpg',
   'img/banner-mobile.jpg',
-  'tags/index.html',
-  'categories/index.html'
+  'tags/index.html'
 ]
 
 const forbiddenGeneratedMarkers = [
@@ -198,11 +198,14 @@ for (const [label, marker] of requiredHomeMarkers) {
 const glacierPreloads = homeHtml.match(/<link\b[^>]*\brel=["']preload["'][^>]*banner-glacier\.jpg[^>]*>/gi) || []
 if (glacierPreloads.length !== 1) problems.push(`首页冰川背景预加载数量应为 1，实际为 ${glacierPreloads.length}`)
 
-for (const route of ['/tags/', '/categories/']) {
+for (const route of ['/tags/']) {
   if (homeHtml.includes(`href="${route}"`) || homeHtml.includes(`href='${route}'`)) problems.push(`首页仍包含暂未启用入口: ${route}`)
 }
 
 const homePostCards = homeHtml.match(/class="recent-post-item"/g) || []
+if (!homeHtml.includes('href="/categories/"') || !homeHtml.includes('文章分类')) problems.push('首页缺少文章分类入口')
+const categoriesHtml = await readFile(path.join(publicRoot, 'categories/index.html'), 'utf8')
+if (!categoriesHtml.includes('category-list-link') || !categoriesHtml.includes('硬件设计')) problems.push('分类汇总页缺少已有分类')
 if (homePostCards.length !== expectedPostSources.length) problems.push(`首页应显示 ${expectedPostSources.length} 张文章卡片，实际为 ${homePostCards.length}`)
 
 const searchXml = await readFile(path.join(publicRoot, 'search.xml'), 'utf8')
