@@ -1,6 +1,7 @@
 import { access, readdir, readFile } from 'node:fs/promises'
 import path from 'node:path'
 import process from 'node:process'
+import katex from 'katex'
 import { fileURLToPath } from 'node:url'
 
 const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
@@ -30,6 +31,8 @@ const requiredOutputs = [
   'CNAME',
   'vercel.json',
   'css/custom.css',
+  `vendor/katex/${katex.version}/katex.min.css`,
+  `vendor/katex/${katex.version}/fonts/KaTeX_Main-Regular.woff2`,
   'js/site-enhancements.js',
   'js/talks-status.js',
   'img/avatar-256.jpg',
@@ -185,7 +188,7 @@ const requiredHomeMarkers = [
   ['键盘与无障碍增强脚本', '/js/site-enhancements.js'],
   ['电源文章标题', powerPostTitle],
   ['电源文章地址', powerPostPath],
-  ['新版自定义样式', '/css/custom.css?v=20260915-3']
+  ['新版自定义样式', '/css/custom.css?v=20260915-4']
 ]
 
 for (const [label, marker] of requiredHomeMarkers) {
@@ -220,6 +223,9 @@ if (!powerHtml.includes(powerPostTitle)) problems.push('电源文章缺少待实
 if (!powerHtml.includes('id="前言"')) problems.push('电源文章缺少“前言”锚点')
 if ((powerHtml.match(/<h2\b/g) || []).length !== 7) problems.push('电源文章二级标题数量不正确')
 if (!powerHtml.includes('id="post-comment"')) problems.push('电源文章没有开启评论')
+if ((powerHtml.match(/class="han-equation"/g) || []).length !== 12) problems.push('电源文章公式没有完整渲染')
+if (!powerHtml.includes(`/vendor/katex/${katex.version}/katex.min.css`)) problems.push('公式缺少本地样式')
+if (powerHtml.includes('class="highlight text"') || powerHtml.includes('katex-error') || powerHtml.includes('{% math %}')) problems.push('公式仍是代码块或渲染失败')
 for (const name of ['schematic.png', 'pcb-layout.png', 'pcb-3d.png']) {
   if (!powerHtml.includes(`/images/posts/lm2596-ams1117-design/${name}`)) problems.push(`电源文章缺少图片 ${name}`)
 }

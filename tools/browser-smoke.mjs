@@ -309,6 +309,23 @@ async function checkPowerArticle(page, viewportName) {
   assert(!state.overflow && !state.broken, `电源文章溢出或图片加载失败：${JSON.stringify(state)}`)
   assert(state.h2Size - state.h3Size >= 7, `电源文章标题层级不足：${JSON.stringify(state)}`)
   assert(state.anchorsValid, '电源文章目录存在失效锚点')
+  const equations = page.locator('#article-container .han-equation')
+  assert(await equations.count() === 12, '公式未完整渲染')
+  assert(await page.locator('#article-container figure.highlight').count() === 0, '非代码内容仍显示代码面板')
+  assert(await equations.locator('math').count() === 12, '公式缺少可访问的 MathML')
+  await page.evaluate(() => document.fonts.ready)
+  const mathState = await equations.evaluateAll(items => items.map(el => ({
+    width: el.getBoundingClientRect().width,
+    articleWidth: document.querySelector('#article-container').clientWidth,
+    overflowX: getComputedStyle(el).overflowX,
+    rendered: getComputedStyle(el.querySelector('.katex-html')).fontFamily.includes('KaTeX'),
+    error: Boolean(el.querySelector('.katex-error'))
+  })))
+  assert(mathState.every(item => item.rendered && !item.error && item.width <= item.articleWidth + 1 && item.overflowX === 'auto'), `公式样式或手机宽度异常：${JSON.stringify(mathState)}`)
+  if (screenshotDirectory) {
+    await equations.nth(1).scrollIntoViewIfNeeded()
+    await equations.nth(1).screenshot({ path: path.join(screenshotDirectory, `han-tax-equation-${viewportName}.png`) })
+  }
   if (screenshotDirectory) {
     await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }))
     await page.screenshot({ path: path.join(screenshotDirectory, `han-tax-power-${viewportName}-opening.png`) })

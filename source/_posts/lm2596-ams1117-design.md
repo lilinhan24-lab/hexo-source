@@ -31,21 +31,18 @@ toc: true
 
 线性稳压器通过内部调整管维持输出电压，输入与输出的电压差落在调整管上。流过它的电流越大，产生的热量就越多。忽略芯片自身消耗，功率损耗可以估算为：
 
-```text
-P ≈ (Vin − Vout) × Iout
-```
+{% math %}
+P \approx (V_{\mathrm{in}} - V_{\mathrm{out}})\,I_{\mathrm{out}}
+{% endmath %}
 
 例如，12 V 输入、3.3 V 输出，稳压器输出电流为 100 mA，压差损耗约为 0.87 W。如果把它的输入先降到 5 V，同样电流下，这部分损耗就降到约 0.17 W。
 
 所以，本版采用“开关降压＋线性稳压”：LM2596 先得到约 5 V，AMS1117 再从这一路得到约 3.3 V。前一级承担大部分电压转换，后一级处理较小的压差。同时将一级输出引出，供需要 5 V 的外设使用。
 
-```text
-直流输入
-  └─ 防反接与输入旁路
-       └─ LM2596 → 约 5 V
-                    ├─ 5 V 输出接口
-                    └─ AMS1117 → 约 3.3 V 输出接口
-```
+直流输入 → 防反接与输入旁路 → LM2596 → 约 5 V，再分为两路：
+
+- 直接接到 5 V 输出接口。
+- 经 AMS1117 稳压后，接到约 3.3 V 输出接口。
 
 ### 本版的设计范围
 
@@ -53,10 +50,14 @@ P ≈ (Vin − Vout) × Iout
 
 5 V 与 3.3 V 两路共地。由于 AMS1117 由一级供电，一级电流需要同时包含外部 5 V 负载和二级输入电流：
 
-```text
-I一级 ≈ I外部5V + I二级输入 + 一级分压及指示灯电流
-I二级输入 ≈ I外部3.3V + 二级分压及芯片自身消耗
-```
+{% math %}
+\begin{aligned}
+I_{\text{一级}} &\approx I_{\text{外部 5V}} + I_{\text{二级输入}} \\
+&\quad + I_{\text{一级分压及指示灯}} \\[0.8em]
+I_{\text{二级输入}} &\approx I_{\text{外部 3.3V}} \\
+&\quad + I_{\text{二级分压及芯片自身消耗}}
+\end{aligned}
+{% endmath %}
 
 因此，本版的 0.5 A 是一级合计的设计工作点，而不是两路各有 0.5 A。后续接入单片机、显示屏或其他模块时，需要按这个分路关系合计电流。
 
@@ -74,10 +75,8 @@ LM2596 内部有一个高速开关。它导通时，输入电源经开关和 L1 
 
 以电感电流连续的情况来看，一个周期内有两种状态：
 
-```text
-开关导通：输入 → U1 内部开关 → L1 → 输出 → GND
-开关关断：GND → D2 → L1 → 输出 → GND
-```
+- 开关导通：输入 → U1 内部开关 → L1 → 输出 → GND。
+- 开关关断：GND → D2 → L1 → 输出 → GND。
 
 导通期间，电感电流上升；关断期间，电感电流下降。D2 因此称为“续流二极管”，它的阴极接 U1 的 OUT，阳极接 GND。
 
@@ -89,18 +88,21 @@ U1 的 OUT 脚输出的是开关脉冲，这个位置也叫 SW 节点。脉冲�
 
 输出升高时，FB 电压也升高，控制电路减少向输出传递的能量；输出降低时则相反。稳态时，FB 电压维持在内部参考值附近。按 1.23 V 的标称参考电压计算：
 
-```text
-VFB = Vout × R1 / (R1 + R2)
-
-Vout ≈ 1.23 × (1 + R2 / R1)
-```
+{% math %}
+\begin{aligned}
+V_{\mathrm{FB}} &= V_{\mathrm{out}}\,\frac{R_1}{R_1 + R_2} \\[0.6em]
+V_{\mathrm{out}} &\approx 1.23\left(1 + \frac{R_2}{R_1}\right)
+\end{aligned}
+{% endmath %}
 
 本版使用 R1＝1 kΩ、R2＝3 kΩ：
 
-```text
-Vout ≈ 1.23 × (1 + 3000 / 1000)
-     ≈ 4.92 V
-```
+{% math %}
+\begin{aligned}
+V_{\mathrm{out}} &\approx 1.23\left(1 + \frac{3000}{1000}\right) \\
+&\approx 4.92\,\mathrm{V}
+\end{aligned}
+{% endmath %}
 
 这组阻值使用 0603、1% 电阻，方便采购和焊接。接口标为 5 V，实际标称计算值是 4.92 V；这里记录计算值，实物输出则在上电后测量。
 
@@ -110,31 +112,40 @@ Vout ≈ 1.23 × (1 + 3000 / 1000)
 
 导通时，忽略开关压降，电感两端电压约为 Vin − Vout。由电感关系式可得：
 
-```text
-电流变化率：di/dt = VL / L
-导通期间电流增量：ΔIL ≈ (Vin − Vout) × ton / L
-```
+{% math %}
+\begin{aligned}
+\frac{\mathrm{d}i}{\mathrm{d}t} &= \frac{V_L}{L} \\[0.6em]
+\Delta I_L &\approx \frac{(V_{\mathrm{in}} - V_{\mathrm{out}})\,t_{\mathrm{on}}}{L}
+\end{aligned}
+{% endmath %}
 
 再用导通时间 ton＝D/f，以及理想连续导通 Buck 的占空比 D≈Vout/Vin，就得到：
 
-```text
-ΔIL ≈ Vout × (1 − Vout/Vin) / (L × f)
-```
+{% math %}
+\Delta I_L \approx \frac{V_{\mathrm{out}}\left(1 - V_{\mathrm{out}}/V_{\mathrm{in}}\right)}{L\,f}
+{% endmath %}
 
 这里 ΔIL 是电流纹波的峰峰值。为了便于估算，取输出 5 V、输入 32 V、开关频率 150 kHz，代入本版使用的 68 μH：
 
-```text
-ΔIL ≈ 5 × (1 − 5/32) / (68 μH × 150 kHz)
-    ≈ 0.414 A
-```
+{% math %}
+\begin{aligned}
+\Delta I_L &\approx \frac{5\,\mathrm{V}\times(1 - 5/32)}{68\,\mu\mathrm{H}\times150\,\mathrm{kHz}} \\
+&\approx 0.414\,\mathrm{A}
+\end{aligned}
+{% endmath %}
 
 当一级平均输出为 0.5 A 时，电感电流围绕这个平均值上下变化：
 
-```text
-峰值 ≈ 0.5 + 0.414/2 = 0.707 A
-谷值 ≈ 0.5 − 0.414/2 = 0.293 A
-有效值 ≈ √(0.5² + 0.414²/12) = 0.514 A
-```
+{% math %}
+\begin{aligned}
+I_{\text{峰值}} &\approx 0.5 + \frac{0.414}{2} \\
+&= 0.707\,\mathrm{A} \\[0.6em]
+I_{\text{谷值}} &\approx 0.5 - \frac{0.414}{2} \\
+&= 0.293\,\mathrm{A} \\[0.6em]
+I_{\text{有效值}} &\approx \sqrt{0.5^2 + \frac{0.414^2}{12}} \\
+&= 0.514\,\mathrm{A}
+\end{aligned}
+{% endmath %}
 
 因此，检查电感是否会饱和，要看约 0.707 A 的峰值；评估绕组发热，则要结合约 0.514 A 的有效值和直流电阻。这也解释了为什么输出电流为 0.5 A，不能只找一颗标着“0.5 A”的电感。
 
@@ -156,9 +167,9 @@ C1、C2 放在 U1 附近，就是为了让快速变化的电流能就近取得�
 
 因此，输出电容承受的是两者之间的电流差：
 
-```text
-iC = iL − i负载
-```
+{% math %}
+i_C = i_L - i_{\text{负载}}
+{% endmath %}
 
 同样的充放电电流作用下，容量越大，电压变化越慢。但实际电容还存在等效串联电阻 ESR，纹波电流经过它，也会形成电压纹波。
 
@@ -174,24 +185,29 @@ iC = iL − i负载
 
 AMS1117 的反馈关系与前一级有所不同：它维持的是 OUT 与 ADJ 之间约 1.25 V 的电压差。因此，R3 接 OUT 与 ADJ，R4 接 ADJ 与 GND。
 
-```text
-Vout ≈ 1.25 × (1 + R4/R3) + Iadj × R4
-```
+{% math %}
+\begin{aligned}
+V_{\mathrm{out}} &\approx 1.25\left(1 + \frac{R_4}{R_3}\right) \\
+&\quad + I_{\mathrm{adj}}\,R_4
+\end{aligned}
+{% endmath %}
 
 本版 R3＝120 Ω、R4＝200 Ω。忽略调节脚电流时：
 
-```text
-Vout ≈ 1.25 × (1 + 200/120)
-     ≈ 3.33 V
-```
+{% math %}
+\begin{aligned}
+V_{\mathrm{out}} &\approx 1.25\left(1 + \frac{200}{120}\right) \\
+&\approx 3.33\,\mathrm{V}
+\end{aligned}
+{% endmath %}
 
 计入数十微安的典型调节脚电流后，约为 3.34 V。
 
 这里选择 120 Ω，还有一个与稳压有关的作用。它两端约有 1.25 V，因此分压支路的电流约为：
 
-```text
-I分压 ≈ 1.25/120 ≈ 10.4 mA
-```
+{% math %}
+I_{\text{分压}} \approx \frac{1.25}{120} \approx 10.4\,\mathrm{mA}
+{% endmath %}
 
 这条支路在外部空载时仍然存在，为可调稳压器提供基本负载。参考的 [AMS1117 原厂应用说明](https://www.alldatasheet.com/html-pdf/49118/ADMOS/AMS1117/519/4/AMS1117.html)采用约 10 mA 的分压支路电流，并给出了输出电压的计算关系。采购时仍需对应所用厂家的具体版本。
 

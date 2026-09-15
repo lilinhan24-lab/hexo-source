@@ -69,6 +69,29 @@ html {
   }
 }
 
+/* Typeset equations are content, not code panels. Long formulas scroll locally. */
+#article-container .han-equation {
+  max-width: 100%;
+  margin: 1.4em 0;
+  padding: 8px 2px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  color: var(--font-color);
+}
+
+#article-container .han-equation .katex-display {
+  margin: 0;
+  text-align: left;
+}
+
+#article-container .han-equation .katex-display > .katex {
+  text-align: left;
+}
+
+#article-container .han-equation .katex {
+  font-size: 1.25em;
+}
+
 .han-skip-link {
   position: fixed;
   top: 12px;
