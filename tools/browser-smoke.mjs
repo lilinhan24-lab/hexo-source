@@ -281,6 +281,13 @@ async function checkPowerArticle(page, viewportName) {
   assert(await page.locator('#article-container h1').count() === 0, '电源文章正文重复了主标题')
   assert(await page.locator('#article-container h2').first().innerText() === '前言', '前言标题不是两个字')
   assert(await page.locator('#article-container h2').count() === 7, '电源文章章节数量不正确')
+  const openingSpace = await page.locator('#article-container > h2').first().evaluate(el => ({
+    gap: el.getBoundingClientRect().top - document.querySelector('#post').getBoundingClientRect().top,
+    margin: parseFloat(getComputedStyle(el).marginTop),
+    padding: parseFloat(getComputedStyle(el).paddingTop),
+    border: parseFloat(getComputedStyle(el).borderTopWidth)
+  }))
+  assert(openingSpace.gap <= 60 && openingSpace.margin === 0 && openingSpace.padding === 0 && openingSpace.border === 0, `前言上方留白过大：${JSON.stringify(openingSpace)}`)
   assert(await page.locator('#card-toc .toc-content').count() === 1, '电源文章没有目录')
   assert(await page.locator('#post-comment').count() === 1, '电源文章没有评论区')
   assert((await page.locator('meta[name="description"]').getAttribute('content')).includes('从实验电路的供电需求出发'), '电源文章描述不正确')

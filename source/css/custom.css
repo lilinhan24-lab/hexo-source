@@ -18,6 +18,14 @@ html {
   line-height: 1.5;
 }
 
+/* The opening heading needs no inter-section gap or separator. */
+#post #article-container > h2:first-child,
+#post #article-container > #post-outdate-notice[hidden]:first-child + h2 {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
+}
+
 #post #article-container > h3 {
   margin: 1.9em 0 0.8em;
   font-size: 20px;
