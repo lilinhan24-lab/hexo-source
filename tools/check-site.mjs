@@ -8,6 +8,8 @@ const publicRoot = path.join(projectRoot, 'public')
 const sourceRoot = path.join(projectRoot, 'source')
 const welcomePostPath = '/posts/welcome-and-roadmap/'
 const welcomePostTitle = '开篇寄语｜本站介绍与未来内容规划'
+const powerPostPath = '/posts/lm2596-ams1117-design/'
+const powerPostTitle = 'LM2596 与 AMS1117 两级降压电源设计：5V/3.3V 输出、器件选型与 PCB 布局（待实验版）'
 const problems = []
 
 const requiredOutputs = [
@@ -17,6 +19,10 @@ const requiredOutputs = [
   'talks/index.html',
   'archives/index.html',
   'posts/welcome-and-roadmap/index.html',
+  'posts/lm2596-ams1117-design/index.html',
+  'images/posts/lm2596-ams1117-design/schematic.png',
+  'images/posts/lm2596-ams1117-design/pcb-layout.png',
+  'images/posts/lm2596-ams1117-design/pcb-3d.png',
   'atom.xml',
   'search.xml',
   'sitemap.xml',
@@ -118,8 +124,9 @@ if (!await exists(draftTemplate)) problems.push('草稿模板已丢失: source/_
 
 const postFiles = (await walk(path.join(sourceRoot, '_posts'))).filter(file => /\.md$/i.test(file))
 const expectedPostSource = path.join(sourceRoot, '_posts', 'welcome-and-roadmap.md')
-if (postFiles.length !== 1 || postFiles[0] !== expectedPostSource) {
-  problems.push(`首篇文章阶段应只存在 source/_posts/welcome-and-roadmap.md，实际为: ${postFiles.map(file => path.relative(projectRoot, file)).join(', ') || '无'}`)
+const expectedPostSources = [expectedPostSource, path.join(sourceRoot, '_posts', 'lm2596-ams1117-design.md')]
+if (postFiles.length !== expectedPostSources.length || expectedPostSources.some(file => !postFiles.includes(file))) {
+  problems.push(`正式文章清单不符，实际为: ${postFiles.map(file => path.relative(projectRoot, file)).join(', ') || '无'}`)
 }
 
 const welcomePostSource = await readFile(expectedPostSource, 'utf8')
@@ -176,7 +183,9 @@ const requiredHomeMarkers = [
   ['本地搜索配置', 'localSearch'],
   ['RSS 订阅入口', '/atom.xml'],
   ['键盘与无障碍增强脚本', '/js/site-enhancements.js'],
-  ['新版自定义样式', '/css/custom.css?v=20260909-2']
+  ['电源文章标题', powerPostTitle],
+  ['电源文章地址', powerPostPath],
+  ['新版自定义样式', '/css/custom.css?v=20260915-1']
 ]
 
 for (const [label, marker] of requiredHomeMarkers) {
@@ -191,18 +200,31 @@ for (const route of ['/tags/', '/categories/']) {
 }
 
 const homePostCards = homeHtml.match(/class="recent-post-item"/g) || []
-if (homePostCards.length !== 1) problems.push(`首页应显示 1 张文章卡片，实际为 ${homePostCards.length}`)
+if (homePostCards.length !== expectedPostSources.length) problems.push(`首页应显示 ${expectedPostSources.length} 张文章卡片，实际为 ${homePostCards.length}`)
 
 const searchXml = await readFile(path.join(publicRoot, 'search.xml'), 'utf8')
 const atomXml = await readFile(path.join(publicRoot, 'atom.xml'), 'utf8')
 const sitemapXml = await readFile(path.join(publicRoot, 'sitemap.xml'), 'utf8')
 for (const [label, content] of [['search.xml', searchXml], ['atom.xml', atomXml], ['sitemap.xml', sitemapXml]]) {
   if (!content.includes(welcomePostPath)) problems.push(`${label} 缺少首篇文章地址: ${welcomePostPath}`)
+  if (!content.includes(powerPostPath)) problems.push(`${label} 缺少电源文章地址: ${powerPostPath}`)
 }
 if (!searchXml.includes('<entry>') || !atomXml.includes('<entry>')) problems.push('Search 或 Atom 没有生成首篇文章条目')
 
 const archiveHtml = await readFile(path.join(publicRoot, 'archives', 'index.html'), 'utf8')
 if (!archiveHtml.includes(welcomePostTitle) || !archiveHtml.includes(welcomePostPath)) problems.push('归档页缺少首篇文章')
+if (!archiveHtml.includes(powerPostTitle) || !archiveHtml.includes(powerPostPath)) problems.push('归档页缺少电源文章')
+
+const powerHtml = await readFile(path.join(publicRoot, 'posts/lm2596-ams1117-design/index.html'), 'utf8')
+if (!powerHtml.includes(powerPostTitle)) problems.push('电源文章缺少待实验版标题')
+if (!powerHtml.includes('id="前言"')) problems.push('电源文章缺少“前言”锚点')
+if ((powerHtml.match(/<h2\b/g) || []).length !== 6) problems.push('电源文章二级标题数量不正确')
+if (!powerHtml.includes('id="post-comment"')) problems.push('电源文章没有开启评论')
+for (const name of ['schematic.png', 'pcb-layout.png', 'pcb-3d.png']) {
+  if (!powerHtml.includes(`/images/posts/lm2596-ams1117-design/${name}`)) problems.push(`电源文章缺少图片 ${name}`)
+}
+if (/src=["']lm2596-ams1117-design\//.test(powerHtml)) problems.push('电源文章仍使用草稿相对图片路径')
+if (!powerHtml.includes('name="description"') || !powerHtml.includes('name="keywords"')) problems.push('电源文章缺少 SEO 元数据')
 
 const articleHtml = await readFile(path.join(publicRoot, 'posts', 'welcome-and-roadmap', 'index.html'), 'utf8')
 if (!articleHtml.includes('id="本站主要内容方向"') || !articleHtml.includes('id="建站初衷与未来展望"')) problems.push('文章页缺少两个二级标题锚点')

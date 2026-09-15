@@ -11,6 +11,8 @@ const siteUrl = process.env.HAN_SITE_URL || managedSiteUrl
 const screenshotDirectory = process.env.HAN_SCREENSHOT_DIR
 const welcomePostPath = '/posts/welcome-and-roadmap/'
 const welcomePostTitle = '开篇寄语｜本站介绍与未来内容规划'
+const powerPostPath = '/posts/lm2596-ams1117-design/'
+const powerPostTitle = 'LM2596 与 AMS1117 两级降压电源设计：5V/3.3V 输出、器件选型与 PCB 布局（待实验版）'
 let serverProcess
 
 function assert(condition, message) {
@@ -76,6 +78,10 @@ async function checkGeneratedEndpoints() {
     ['/atom.xml', welcomePostPath],
     ['/search.xml', welcomePostPath],
     ['/sitemap.xml', welcomePostPath],
+    ['/archives/', powerPostTitle],
+    ['/atom.xml', powerPostPath],
+    ['/search.xml', powerPostPath],
+    ['/sitemap.xml', powerPostPath],
     ['/robots.txt', 'Sitemap: https://www.han.tax/sitemap.xml']
   ]
 
@@ -114,9 +120,10 @@ async function runBrowserChecks() {
     assert(await page.locator('.han-motto').innerText() === '逆水行舟，不进则退', '侧栏座右铭不正确')
     assert(await page.locator('.han-motto').isVisible(), '侧栏座右铭不可见')
     assert(await page.locator('.han-skip-link').count() === 1, '首页缺少跳转到主要内容链接')
-    assert(await page.locator('#recent-posts .recent-post-item').count() === 1, '首页没有且仅有一张文章卡片')
-    assert(await page.locator('#recent-posts .article-title').innerText() === welcomePostTitle, '首页文章卡片标题不正确')
-    assert((await page.locator('#recent-posts .content').innerText()).includes('介绍硬件小小林建立个人技术博客的初衷'), '首页文章摘要不正确')
+    assert(await page.locator('#recent-posts .recent-post-item').count() === 2, '首页应有两张文章卡片')
+    assert(await page.locator('#recent-posts .article-title').first().innerText() === powerPostTitle, '最新文章卡片标题不正确')
+    assert((await page.locator('#recent-posts').innerText()).includes(welcomePostTitle), '首页缺少开篇文章')
+    assert((await page.locator('#recent-posts .content').first().innerText()).includes('面向 STM32 最小系统板及外设实验'), '电源文章摘要不正确')
     assert(await page.locator('.card-recent-post').count() === 1, '最近文章侧栏卡片没有恢复')
     assert((await page.locator('.card-recent-post').innerText()).includes(welcomePostTitle), '最近文章卡片缺少首篇文章')
     assert(await page.locator('a[href*="github.com/lilinhan24-lab"]').count() === 0, '首页仍显示个人 GitHub 入口')
@@ -159,6 +166,9 @@ async function runBrowserChecks() {
     await searchInput.fill('开篇寄语')
     await page.waitForFunction(() => document.querySelectorAll('.local-search-hit-item').length === 1)
     assert((await page.locator('#local-search-results').innerText()).includes(welcomePostTitle), '搜索“开篇寄语”没有返回首篇文章')
+    await searchInput.fill('LM2596')
+    await page.waitForFunction(() => document.querySelector('#local-search-results')?.textContent?.includes('待实验版'))
+    assert(await page.locator('.local-search-hit-item').count() === 1, '电源文章搜索结果数量不正确')
 
     const emptyQuery = '不存在的硬件文章-20260909'
     await searchInput.fill(emptyQuery)
@@ -185,6 +195,8 @@ async function runBrowserChecks() {
     assert(await page.locator('#post-comment').count() === 1, '文章页没有评论容器')
     assert((await page.locator('#article-container').innerText()).includes('所有内容全部来源于真实项目、真实调试、真实竞赛经历。'), '文章正文缺少原文关键句')
     if (screenshotDirectory) await page.screenshot({ path: path.join(screenshotDirectory, 'han-tax-article-desktop.png'), fullPage: true })
+
+    await checkPowerArticle(page, 'desktop')
 
     await page.goto(new URL('/about/', siteUrl).href, { waitUntil: 'domcontentloaded' })
     const aboutText = await page.locator('#article-container').innerText()
@@ -227,6 +239,7 @@ async function runBrowserChecks() {
     assert(mobileArticleState.scrollWidth <= mobileArticleState.innerWidth + 1, `移动端文章存在横向溢出：${mobileArticleState.scrollWidth}px > ${mobileArticleState.innerWidth}px`)
     assert(mobileArticleState.headingRights.every(right => right <= mobileArticleState.innerWidth + 1), '移动端三级标题超出屏幕')
     if (screenshotDirectory) await mobilePage.screenshot({ path: path.join(screenshotDirectory, 'han-tax-article-mobile.png'), fullPage: true })
+    await checkPowerArticle(mobilePage, 'mobile')
     await mobileContext.close()
 
     await page.goto(new URL('/404.html', siteUrl).href, { waitUntil: 'domcontentloaded' })
@@ -251,6 +264,40 @@ async function runBrowserChecks() {
     await context.close()
   } finally {
     await browser.close()
+  }
+}
+
+async function checkPowerArticle(page, viewportName) {
+  await page.goto(new URL(powerPostPath, siteUrl).href, { waitUntil: 'load' })
+  assert(await page.locator('.post-title').innerText() === powerPostTitle, '电源文章标题不正确')
+  assert(await page.locator('#article-container h1').count() === 0, '电源文章正文重复了主标题')
+  assert(await page.locator('#article-container h2').first().innerText() === '前言', '前言标题不是两个字')
+  assert(await page.locator('#article-container h2').count() === 6, '电源文章章节数量不正确')
+  assert(await page.locator('#card-toc .toc-content').count() === 1, '电源文章没有目录')
+  assert(await page.locator('#post-comment').count() === 1, '电源文章没有评论区')
+  assert((await page.locator('meta[name="description"]').getAttribute('content')).includes('面向 STM32'), '电源文章描述不正确')
+  assert((await page.locator('meta[name="keywords"]').getAttribute('content')).includes('LM2596'), '电源文章缺少关键词')
+  const images = page.locator('#article-container img')
+  assert(await images.count() === 3, '电源文章图片数量不正确')
+  for (const img of await images.all()) {
+    await img.scrollIntoViewIfNeeded()
+    await img.evaluate(el => el.decode())
+    assert(Boolean(await img.getAttribute('alt')), '电源文章图片缺少 alt')
+  }
+  const state = await page.evaluate(() => ({
+    overflow: document.documentElement.scrollWidth > innerWidth + 1,
+    h2Size: parseFloat(getComputedStyle(document.querySelector('#article-container h2')).fontSize),
+    h3Size: parseFloat(getComputedStyle(document.querySelector('#article-container h3')).fontSize),
+    broken: [...document.querySelectorAll('#article-container img')].some(img => !img.complete || !img.naturalWidth),
+    anchorsValid: [...document.querySelectorAll('#card-toc a')].filter(a => a.hash).every(a => document.getElementById(decodeURIComponent(a.hash.slice(1))))
+  }))
+  assert(!state.overflow && !state.broken, `电源文章溢出或图片加载失败：${JSON.stringify(state)}`)
+  assert(state.h2Size - state.h3Size >= 7, `电源文章标题层级不足：${JSON.stringify(state)}`)
+  assert(state.anchorsValid, '电源文章目录存在失效锚点')
+  if (screenshotDirectory) {
+    await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }))
+    await page.screenshot({ path: path.join(screenshotDirectory, `han-tax-power-${viewportName}-opening.png`) })
+    await page.screenshot({ path: path.join(screenshotDirectory, `han-tax-power-${viewportName}.png`), fullPage: true })
   }
 }
 
