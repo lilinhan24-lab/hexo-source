@@ -9,7 +9,7 @@ const sourceRoot = path.join(projectRoot, 'source')
 const welcomePostPath = '/posts/welcome-and-roadmap/'
 const welcomePostTitle = '开篇寄语｜本站介绍与未来内容规划'
 const powerPostPath = '/posts/lm2596-ams1117-design/'
-const powerPostTitle = 'LM2596 与 AMS1117 两级降压电源设计：5V/3.3V 输出、器件选型与 PCB 布局（待实验版）'
+const powerPostTitle = 'LM2596＋AMS1117 两级降压电源设计（待实验版）'
 const problems = []
 
 const requiredOutputs = [
@@ -218,7 +218,7 @@ if (!archiveHtml.includes(powerPostTitle) || !archiveHtml.includes(powerPostPath
 const powerHtml = await readFile(path.join(publicRoot, 'posts/lm2596-ams1117-design/index.html'), 'utf8')
 if (!powerHtml.includes(powerPostTitle)) problems.push('电源文章缺少待实验版标题')
 if (!powerHtml.includes('id="前言"')) problems.push('电源文章缺少“前言”锚点')
-if ((powerHtml.match(/<h2\b/g) || []).length !== 6) problems.push('电源文章二级标题数量不正确')
+if ((powerHtml.match(/<h2\b/g) || []).length !== 7) problems.push('电源文章二级标题数量不正确')
 if (!powerHtml.includes('id="post-comment"')) problems.push('电源文章没有开启评论')
 for (const name of ['schematic.png', 'pcb-layout.png', 'pcb-3d.png']) {
   if (!powerHtml.includes(`/images/posts/lm2596-ams1117-design/${name}`)) problems.push(`电源文章缺少图片 ${name}`)

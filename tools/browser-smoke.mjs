@@ -12,7 +12,7 @@ const screenshotDirectory = process.env.HAN_SCREENSHOT_DIR
 const welcomePostPath = '/posts/welcome-and-roadmap/'
 const welcomePostTitle = '开篇寄语｜本站介绍与未来内容规划'
 const powerPostPath = '/posts/lm2596-ams1117-design/'
-const powerPostTitle = 'LM2596 与 AMS1117 两级降压电源设计：5V/3.3V 输出、器件选型与 PCB 布局（待实验版）'
+const powerPostTitle = 'LM2596＋AMS1117 两级降压电源设计（待实验版）'
 let serverProcess
 
 function assert(condition, message) {
@@ -123,7 +123,7 @@ async function runBrowserChecks() {
     assert(await page.locator('#recent-posts .recent-post-item').count() === 2, '首页应有两张文章卡片')
     assert(await page.locator('#recent-posts .article-title').first().innerText() === powerPostTitle, '最新文章卡片标题不正确')
     assert((await page.locator('#recent-posts').innerText()).includes(welcomePostTitle), '首页缺少开篇文章')
-    assert((await page.locator('#recent-posts .content').first().innerText()).includes('面向 STM32 最小系统板及外设实验'), '电源文章摘要不正确')
+    assert((await page.locator('#recent-posts .content').first().innerText()).includes('从实验电路的供电需求出发'), '电源文章摘要不正确')
     assert(await page.locator('.card-recent-post').count() === 1, '最近文章侧栏卡片没有恢复')
     assert((await page.locator('.card-recent-post').innerText()).includes(welcomePostTitle), '最近文章卡片缺少首篇文章')
     assert(await page.locator('a[href*="github.com/lilinhan24-lab"]').count() === 0, '首页仍显示个人 GitHub 入口')
@@ -280,10 +280,10 @@ async function checkPowerArticle(page, viewportName) {
   assert(titleState.clamp === 'none' && !titleState.clipped && titleState.top >= 60 && titleState.bottom <= titleState.headerBottom, `文章标题被截断或超出标题区：${JSON.stringify(titleState)}`)
   assert(await page.locator('#article-container h1').count() === 0, '电源文章正文重复了主标题')
   assert(await page.locator('#article-container h2').first().innerText() === '前言', '前言标题不是两个字')
-  assert(await page.locator('#article-container h2').count() === 6, '电源文章章节数量不正确')
+  assert(await page.locator('#article-container h2').count() === 7, '电源文章章节数量不正确')
   assert(await page.locator('#card-toc .toc-content').count() === 1, '电源文章没有目录')
   assert(await page.locator('#post-comment').count() === 1, '电源文章没有评论区')
-  assert((await page.locator('meta[name="description"]').getAttribute('content')).includes('面向 STM32'), '电源文章描述不正确')
+  assert((await page.locator('meta[name="description"]').getAttribute('content')).includes('从实验电路的供电需求出发'), '电源文章描述不正确')
   assert((await page.locator('meta[name="keywords"]').getAttribute('content')).includes('LM2596'), '电源文章缺少关键词')
   const images = page.locator('#article-container img')
   assert(await images.count() === 3, '电源文章图片数量不正确')
