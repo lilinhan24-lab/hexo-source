@@ -12,7 +12,7 @@ const screenshotDirectory = process.env.HAN_SCREENSHOT_DIR
 const welcomePostPath = '/posts/welcome-and-roadmap/'
 const welcomePostTitle = '开篇寄语｜本站介绍与未来内容规划'
 const powerPostPath = '/posts/lm2596-ams1117-design/'
-const powerPostTitle = 'LM2596＋AMS1117 两级降压电源设计（待实验版）'
+const powerPostTitle = 'LM2596＋AMS1117 两级降压电源设计'
 let serverProcess
 
 function assert(condition, message) {
@@ -168,7 +168,7 @@ async function runBrowserChecks() {
     await page.waitForFunction(() => document.querySelectorAll('.local-search-hit-item').length === 1)
     assert((await page.locator('#local-search-results').innerText()).includes(welcomePostTitle), '搜索“开篇寄语”没有返回首篇文章')
     await searchInput.fill('LM2596')
-    await page.waitForFunction(() => document.querySelector('#local-search-results')?.textContent?.includes('待实验版'))
+    await page.waitForFunction(() => document.querySelector('#local-search-results')?.textContent?.includes('两级降压电源设计'))
     assert(await page.locator('.local-search-hit-item').count() === 1, '电源文章搜索结果数量不正确')
 
     const emptyQuery = '不存在的硬件文章-20260909'
@@ -299,7 +299,7 @@ async function checkPowerArticle(page, viewportName) {
   assert(titleState.clamp === 'none' && !titleState.clipped && titleState.top >= 60 && titleState.bottom <= titleState.headerBottom, `文章标题被截断或超出标题区：${JSON.stringify(titleState)}`)
   assert(await page.locator('#article-container h1').count() === 0, '电源文章正文重复了主标题')
   assert(await page.locator('#article-container h2').first().innerText() === '前言', '前言标题不是两个字')
-  assert(await page.locator('#article-container h2').count() === 7, '电源文章章节数量不正确')
+  assert(await page.locator('#article-container h2').count() === 11, '电源文章章节数量不正确')
   const openingSpace = await page.locator('#article-container > h2').first().evaluate(el => ({
     gap: el.getBoundingClientRect().top - document.querySelector('#post').getBoundingClientRect().top,
     margin: parseFloat(getComputedStyle(el).marginTop),
@@ -312,7 +312,7 @@ async function checkPowerArticle(page, viewportName) {
   assert((await page.locator('meta[name="description"]').getAttribute('content')).includes('从实验电路的供电需求出发'), '电源文章描述不正确')
   assert((await page.locator('meta[name="keywords"]').getAttribute('content')).includes('LM2596'), '电源文章缺少关键词')
   const images = page.locator('#article-container img')
-  assert(await images.count() === 3, '电源文章图片数量不正确')
+  assert(await images.count() === 6, '电源文章图片数量不正确')
   for (const img of await images.all()) {
     await img.scrollIntoViewIfNeeded()
     await img.evaluate(el => el.decode())

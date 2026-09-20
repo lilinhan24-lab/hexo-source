@@ -10,7 +10,7 @@ const sourceRoot = path.join(projectRoot, 'source')
 const welcomePostPath = '/posts/welcome-and-roadmap/'
 const welcomePostTitle = '开篇寄语｜本站介绍与未来内容规划'
 const powerPostPath = '/posts/lm2596-ams1117-design/'
-const powerPostTitle = 'LM2596＋AMS1117 两级降压电源设计（待实验版）'
+const powerPostTitle = 'LM2596＋AMS1117 两级降压电源设计'
 const problems = []
 
 const requiredOutputs = [
@@ -25,6 +25,9 @@ const requiredOutputs = [
   'images/posts/lm2596-ams1117-design/schematic.png',
   'images/posts/lm2596-ams1117-design/pcb-layout.png',
   'images/posts/lm2596-ams1117-design/pcb-3d.png',
+  'images/posts/lm2596-ams1117-design/assembled-board.jpg',
+  'images/posts/lm2596-ams1117-design/5v-load-800ma.jpg',
+  'images/posts/lm2596-ams1117-design/3v3-load-800ma.jpg',
   'atom.xml',
   'search.xml',
   'sitemap.xml',
@@ -222,14 +225,14 @@ if (!archiveHtml.includes(welcomePostTitle) || !archiveHtml.includes(welcomePost
 if (!archiveHtml.includes(powerPostTitle) || !archiveHtml.includes(powerPostPath)) problems.push('归档页缺少电源文章')
 
 const powerHtml = await readFile(path.join(publicRoot, 'posts/lm2596-ams1117-design/index.html'), 'utf8')
-if (!powerHtml.includes(powerPostTitle)) problems.push('电源文章缺少待实验版标题')
+if (!powerHtml.includes(powerPostTitle)) problems.push('电源文章标题不正确')
 if (!powerHtml.includes('id="前言"')) problems.push('电源文章缺少“前言”锚点')
-if ((powerHtml.match(/<h2\b/g) || []).length !== 7) problems.push('电源文章二级标题数量不正确')
+if ((powerHtml.match(/<h2\b/g) || []).length !== 11) problems.push('电源文章二级标题数量不正确')
 if (!powerHtml.includes('id="post-comment"')) problems.push('电源文章没有开启评论')
 if ((powerHtml.match(/class="han-equation"/g) || []).length !== 12) problems.push('电源文章公式没有完整渲染')
 if (!powerHtml.includes(`/vendor/katex/${katex.version}/katex.min.css`)) problems.push('公式缺少本地样式')
 if (powerHtml.includes('class="highlight text"') || powerHtml.includes('katex-error') || powerHtml.includes('{% math %}')) problems.push('公式仍是代码块或渲染失败')
-for (const name of ['schematic.png', 'pcb-layout.png', 'pcb-3d.png']) {
+for (const name of ['schematic.png', 'pcb-layout.png', 'pcb-3d.png', 'assembled-board.jpg', '5v-load-800ma.jpg', '3v3-load-800ma.jpg']) {
   if (!powerHtml.includes(`/images/posts/lm2596-ams1117-design/${name}`)) problems.push(`电源文章缺少图片 ${name}`)
 }
 if (/src=["']lm2596-ams1117-design\//.test(powerHtml)) problems.push('电源文章仍使用草稿相对图片路径')
