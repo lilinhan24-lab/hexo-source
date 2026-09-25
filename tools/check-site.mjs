@@ -11,6 +11,8 @@ const welcomePostPath = '/posts/welcome-and-roadmap/'
 const welcomePostTitle = '开篇寄语｜本站介绍与未来内容规划'
 const powerPostPath = '/posts/lm2596-ams1117-design/'
 const powerPostTitle = 'LM2596＋AMS1117 两级降压电源设计'
+const robotPostPath = '/posts/stm32-mecanum-vision-arm/'
+const robotPostTitle = '基于 STM32 与 K230 的麦轮视觉拾取机器人：系统方案与硬件设计  （未完成版）'
 const problems = []
 
 const requiredOutputs = [
@@ -22,6 +24,8 @@ const requiredOutputs = [
   'categories/index.html',
   'posts/welcome-and-roadmap/index.html',
   'posts/lm2596-ams1117-design/index.html',
+  'posts/stm32-mecanum-vision-arm/index.html',
+  ...['remote-schematic.png', 'remote-pcb.png', 'remote-3d.png', 'arm-schematic.png', 'arm-pcb.png', 'arm-3d.png'].map(name => `images/stm32-mecanum-vision-arm/${name}`),
   'images/posts/lm2596-ams1117-design/schematic.png',
   'images/posts/lm2596-ams1117-design/pcb-layout.png',
   'images/posts/lm2596-ams1117-design/pcb-3d.png',
@@ -130,7 +134,7 @@ if (!await exists(draftTemplate)) problems.push('草稿模板已丢失: source/_
 
 const postFiles = (await walk(path.join(sourceRoot, '_posts'))).filter(file => /\.md$/i.test(file))
 const expectedPostSource = path.join(sourceRoot, '_posts', 'welcome-and-roadmap.md')
-const expectedPostSources = [expectedPostSource, path.join(sourceRoot, '_posts', 'lm2596-ams1117-design.md')]
+const expectedPostSources = [expectedPostSource, path.join(sourceRoot, '_posts', 'lm2596-ams1117-design.md'), path.join(sourceRoot, '_posts', 'stm32-mecanum-vision-arm.md')]
 if (postFiles.length !== expectedPostSources.length || expectedPostSources.some(file => !postFiles.includes(file))) {
   problems.push(`正式文章清单不符，实际为: ${postFiles.map(file => path.relative(projectRoot, file)).join(', ') || '无'}`)
 }
@@ -191,6 +195,8 @@ const requiredHomeMarkers = [
   ['键盘与无障碍增强脚本', '/js/site-enhancements.js'],
   ['电源文章标题', powerPostTitle],
   ['电源文章地址', powerPostPath],
+  ['机器人文章标题', robotPostTitle],
+  ['机器人文章地址', robotPostPath],
   ['新版自定义样式', '/css/custom.css?v=20260915-5']
 ]
 
@@ -217,12 +223,19 @@ const sitemapXml = await readFile(path.join(publicRoot, 'sitemap.xml'), 'utf8')
 for (const [label, content] of [['search.xml', searchXml], ['atom.xml', atomXml], ['sitemap.xml', sitemapXml]]) {
   if (!content.includes(welcomePostPath)) problems.push(`${label} 缺少首篇文章地址: ${welcomePostPath}`)
   if (!content.includes(powerPostPath)) problems.push(`${label} 缺少电源文章地址: ${powerPostPath}`)
+  if (!content.includes(robotPostPath)) problems.push(`${label} 缺少机器人文章地址: ${robotPostPath}`)
 }
 if (!searchXml.includes('<entry>') || !atomXml.includes('<entry>')) problems.push('Search 或 Atom 没有生成首篇文章条目')
 
 const archiveHtml = await readFile(path.join(publicRoot, 'archives', 'index.html'), 'utf8')
 if (!archiveHtml.includes(welcomePostTitle) || !archiveHtml.includes(welcomePostPath)) problems.push('归档页缺少首篇文章')
 if (!archiveHtml.includes(powerPostTitle) || !archiveHtml.includes(powerPostPath)) problems.push('归档页缺少电源文章')
+if (!archiveHtml.includes(robotPostTitle) || !archiveHtml.includes(robotPostPath)) problems.push('归档页缺少机器人文章')
+
+const robotHtml = await readFile(path.join(publicRoot, 'posts/stm32-mecanum-vision-arm/index.html'), 'utf8')
+if (!robotHtml.includes(robotPostTitle) || !robotHtml.includes('尚未绘制')) problems.push('机器人文章标题或项目状态缺失')
+if ((robotHtml.match(/class="han-equation"/g) || []).length !== 4) problems.push('机器人文章公式未完整渲染')
+if (robotHtml.includes('{% math %}') || robotHtml.includes('katex-error')) problems.push('机器人文章公式渲染异常')
 
 const powerHtml = await readFile(path.join(publicRoot, 'posts/lm2596-ams1117-design/index.html'), 'utf8')
 if (!powerHtml.includes(powerPostTitle)) problems.push('电源文章标题不正确')

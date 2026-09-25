@@ -13,6 +13,8 @@ const welcomePostPath = '/posts/welcome-and-roadmap/'
 const welcomePostTitle = '开篇寄语｜本站介绍与未来内容规划'
 const powerPostPath = '/posts/lm2596-ams1117-design/'
 const powerPostTitle = 'LM2596＋AMS1117 两级降压电源设计'
+const robotPostPath = '/posts/stm32-mecanum-vision-arm/'
+const robotPostTitle = '基于 STM32 与 K230 的麦轮视觉拾取机器人：系统方案与硬件设计 （未完成版）'
 let serverProcess
 
 function assert(condition, message) {
@@ -82,6 +84,10 @@ async function checkGeneratedEndpoints() {
     ['/atom.xml', powerPostPath],
     ['/search.xml', powerPostPath],
     ['/sitemap.xml', powerPostPath],
+    ['/archives/', robotPostPath],
+    ['/atom.xml', robotPostPath],
+    ['/search.xml', robotPostPath],
+    ['/sitemap.xml', robotPostPath],
     ['/robots.txt', 'Sitemap: https://www.han.tax/sitemap.xml']
   ]
 
@@ -120,10 +126,10 @@ async function runBrowserChecks() {
     assert(await page.locator('.han-motto').innerText() === '逆水行舟，不进则退', '侧栏座右铭不正确')
     assert(await page.locator('.han-motto').isVisible(), '侧栏座右铭不可见')
     assert(await page.locator('.han-skip-link').count() === 1, '首页缺少跳转到主要内容链接')
-    assert(await page.locator('#recent-posts .recent-post-item').count() === 2, '首页应有两张文章卡片')
-    assert(await page.locator('#recent-posts .article-title').first().innerText() === powerPostTitle, '最新文章卡片标题不正确')
+    assert(await page.locator('#recent-posts .recent-post-item').count() === 3, '首页应有三张文章卡片')
+    assert(await page.locator('#recent-posts .article-title').first().innerText() === robotPostTitle, '最新文章卡片标题不正确')
     assert((await page.locator('#recent-posts').innerText()).includes(welcomePostTitle), '首页缺少开篇文章')
-    assert((await page.locator('#recent-posts .content').first().innerText()).includes('从实验电路的供电需求出发'), '电源文章摘要不正确')
+    assert((await page.locator('#recent-posts .content').first().innerText()).includes('从物流搬运与拾取场景出发'), '机器人文章摘要不正确')
     assert(await page.locator('.card-recent-post').count() === 1, '最近文章侧栏卡片没有恢复')
     assert((await page.locator('.card-recent-post').innerText()).includes(welcomePostTitle), '最近文章卡片缺少首篇文章')
     assert(await page.locator('a[href*="github.com/lilinhan24-lab"]').count() === 0, '首页仍显示个人 GitHub 入口')
@@ -169,7 +175,7 @@ async function runBrowserChecks() {
     assert((await page.locator('#local-search-results').innerText()).includes(welcomePostTitle), '搜索“开篇寄语”没有返回首篇文章')
     await searchInput.fill('LM2596')
     await page.waitForFunction(() => document.querySelector('#local-search-results')?.textContent?.includes('两级降压电源设计'))
-    assert(await page.locator('.local-search-hit-item').count() === 1, '电源文章搜索结果数量不正确')
+    assert(await page.locator('.local-search-hit-item a').evaluateAll((links, expectedPath) => links.some(link => new URL(link.href).pathname === expectedPath), powerPostPath), '搜索结果缺少电源文章链接')
 
     const emptyQuery = '不存在的硬件文章-20260909'
     await searchInput.fill(emptyQuery)
