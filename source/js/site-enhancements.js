@@ -68,6 +68,19 @@
     }
   })
 
+  window.addEventListener('search:loaded', () => {
+    // The theme reveals the input in its event listener. Wait until all listeners
+    // have run; a slow download can outlast its initial 300ms focus timer.
+    queueMicrotask(() => {
+      const dialog = document.querySelector('#local-search .search-dialog')
+      const trigger = document.querySelector('#search-button > .search')
+      if (dialog && getComputedStyle(dialog).display !== 'none' &&
+          [document.body, trigger].includes(document.activeElement)) {
+        dialog.querySelector('input')?.focus({ preventScroll: true })
+      }
+    })
+  })
+
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', enhancePage, { once: true })
   } else {

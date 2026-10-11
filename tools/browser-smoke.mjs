@@ -82,7 +82,7 @@ async function checkGeneratedEndpoints() {
     ['/atom.xml', powerPostPath],
     ['/search.xml', powerPostPath],
     ['/sitemap.xml', powerPostPath],
-    ['/robots.txt', 'Sitemap: https://www.han.tax/sitemap.xml']
+    ['/robots.txt', process.env.HAN_PREVIEW === '1' ? 'Disallow: /' : 'Sitemap: https://www.han.tax/sitemap.xml']
   ]
 
   for (const [endpoint, marker] of checks) {
@@ -120,6 +120,9 @@ async function runBrowserChecks() {
     assert(await page.locator('.han-motto').innerText() === '逆水行舟，不进则退', '侧栏座右铭不正确')
     assert(await page.locator('.han-motto').isVisible(), '侧栏座右铭不可见')
     assert(await page.locator('.han-skip-link').count() === 1, '首页缺少跳转到主要内容链接')
+    if (process.env.HAN_PREVIEW === '1') {
+      assert(await page.locator('#footer a[href="/atom.xml"]').count() === 1, '预览缺少可见 RSS 入口')
+    }
     assert(await page.locator('#recent-posts .recent-post-item').count() === 2, '首页应有两张文章卡片')
     assert(await page.locator('#recent-posts .article-title').first().innerText() === powerPostTitle, '最新文章卡片标题不正确')
     assert((await page.locator('#recent-posts').innerText()).includes(welcomePostTitle), '首页缺少开篇文章')
@@ -161,6 +164,11 @@ async function runBrowserChecks() {
       await page.screenshot({ path: path.join(screenshotDirectory, 'han-tax-home-desktop.png'), fullPage: true })
     }
 
+    // Reproduce an index download slower than the theme's 300ms focus timer.
+    await page.route('**/search.xml', async route => {
+      await new Promise(resolve => setTimeout(resolve, 650))
+      await route.continue()
+    })
     await page.keyboard.press(process.platform === 'darwin' ? 'Meta+K' : 'Control+K')
     await page.locator('#local-search .local-search-input input').waitFor({ state: 'visible' })
     const searchInput = page.locator('#local-search .local-search-input input')
@@ -230,7 +238,12 @@ async function runBrowserChecks() {
     assert(mobileState.scrollWidth <= mobileState.innerWidth + 1, `移动端首页存在横向溢出：${mobileState.scrollWidth}px > ${mobileState.innerWidth}px`)
     assert(mobileState.backgroundImage.includes('banner-glacier.jpg'), '移动端没有使用冰川背景')
     assert(['center center', '50% 50%'].includes(mobileState.backgroundPosition), `移动端冰川背景没有居中：${mobileState.backgroundPosition}`)
-    assert(mobileState.headerHeight >= 480, `移动端首屏高度不足 480px：${mobileState.headerHeight}px`)
+    if (process.env.HAN_PREVIEW === '1') {
+      assert(mobileState.headerHeight >= 380 && mobileState.headerHeight <= 440, `预览移动端背景高度异常：${mobileState.headerHeight}`)
+      assert(await mobilePage.locator('#recent-posts .content').first().evaluate(el => el.getBoundingClientRect().top < innerHeight - 50), '预览首屏仍看不到文章摘要')
+    } else {
+      assert(mobileState.headerHeight >= 480, `移动端首屏高度不足 480px：${mobileState.headerHeight}px`)
+    }
     assert(await mobilePage.locator('#sidebar-menus .site-data').count() === 0, '手机菜单仍包含文章、标签或分类数字')
     const mobileNavText = (await mobilePage.locator('#sidebar-menus .menus_item > a.site-page').allInnerTexts()).map(text => text.trim())
     assert(JSON.stringify(mobileNavText) === JSON.stringify(['首页', '文章', '文章分类', '关于', '说说']), `手机导航不正确：${mobileNavText.join(' / ')}`)
@@ -339,6 +352,14 @@ async function checkPowerArticle(page, viewportName) {
   assert((await page.locator('meta[name="description"]').getAttribute('content')).includes('从实验电路的供电需求出发'), '电源文章描述不正确')
   assert((await page.locator('meta[name="keywords"]').getAttribute('content')).includes('LM2596'), '电源文章缺少关键词')
   const images = page.locator('#article-container img')
+  if (process.env.HAN_PREVIEW === '1') {
+    assert((await page.locator('meta[property="og:image"]').getAttribute('content')).includes('assembled-board'), '分享图仍使用头像')
+    assert(await page.locator('#article-container img[srcset]').count() === 3, '三张实拍照片缺少响应式版本')
+    assert(await page.locator('#article-container a.han-original-image').count() === 6, '正文图片缺少查看原图入口')
+    if (viewportName === 'mobile') {
+      assert(await page.locator('#article-container').evaluate(el => parseFloat(getComputedStyle(el).fontSize)) === 16, '手机正文不是 16px')
+    }
+  }
   assert(await images.count() === 6, '电源文章图片数量不正确')
   for (const img of await images.all()) {
     await img.scrollIntoViewIfNeeded()
