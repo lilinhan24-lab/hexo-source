@@ -2,10 +2,32 @@
   --han-meta-color: #666;
   --han-footer-bg: #083f6b;
   --han-focus-color: #ff7242;
+  --han-link-color: #0878b5;
+}
+
+[data-theme='dark'] {
+  --han-meta-color: #aaa;
+  --han-link-color: #69bdf0;
+}
+
+#article-container .img-alt {
+  color: var(--han-meta-color);
+}
+
+#article-container a[href^='http'],
+#article-container a[href^='/'] {
+  color: var(--han-link-color);
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
 }
 
 html {
   scroll-padding-top: 80px;
+}
+
+#article-container img[width][height] {
+  max-width: 100%;
+  height: auto;
 }
 
 /* Keep section headings visibly distinct from subsection headings. */
@@ -185,6 +207,20 @@ html {
 .han-talk-list {
   display: grid;
   gap: 1rem;
+}
+
+.han-talks-retry {
+  padding: 0.25em 0.8em;
+  border: 1px solid currentColor;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--han-link-color);
+  font: inherit;
+  cursor: pointer;
+}
+
+.han-talks-retry:hover {
+  text-decoration: underline;
 }
 
 .han-talk-item {

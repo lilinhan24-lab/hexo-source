@@ -1053,9 +1053,9 @@ inject:
   head:
     - '<link rel="preload" href="/img/banner-glacier.jpg" as="image" fetchpriority="high">'
     - '<link rel="alternate" href="/atom.xml" title="小小林的个人博客" type="application/atom+xml">'
-    - <link rel="stylesheet" href="/css/custom.css?v=20260915-5">
+    - <link rel="stylesheet" href="/css/custom.css?v=20261011-1">
   bottom:
-    - <script src="/js/site-enhancements.js" defer></script>
+    - <script src="/js/site-enhancements.js?v=20261011-1" defer></script>
 
 # CDN Settings
 # Don't modify the following settings unless you know how they work

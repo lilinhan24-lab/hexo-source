@@ -17,6 +17,23 @@
     }
 
     const searchTrigger = document.querySelector('#search-button > .search')
+    const searchDialog = document.querySelector('#local-search .search-dialog')
+    const searchInput = searchDialog?.querySelector('input')
+    const searchClose = searchDialog?.querySelector('.search-close-button')
+    searchInput?.setAttribute('aria-label', '搜索文章')
+    searchClose?.setAttribute('aria-label', '关闭搜索')
+    if (searchDialog && !searchDialog.dataset.focusReady) {
+      searchDialog.dataset.focusReady = 'true'
+      // Theme owns the animation. Restore focus only after the dialog is hidden.
+      let wasOpen = getComputedStyle(searchDialog).display !== 'none'
+      new MutationObserver(() => {
+        const isOpen = getComputedStyle(searchDialog).display !== 'none'
+        if (wasOpen && !isOpen && searchDialog.contains(document.activeElement)) {
+          document.querySelector('#search-button > .search')?.focus({ preventScroll: true })
+        }
+        wasOpen = isOpen
+      }).observe(searchDialog, { attributes: true, attributeFilter: ['style'] })
+    }
     if (searchTrigger) {
       searchTrigger.setAttribute('role', 'button')
       searchTrigger.setAttribute('tabindex', '0')

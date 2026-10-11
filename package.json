@@ -33,6 +33,7 @@
     "hexo-server": "^3.0.0",
     "hexo-theme-butterfly": "^5.7.0",
     "hexo-wordcount": "^6.0.1",
+    "image-size": "2.0.4",
     "katex": "0.18.7"
   },
   "devDependencies": {

@@ -2,10 +2,10 @@ import { spawn } from 'node:child_process'
 import { access, mkdir } from 'node:fs/promises'
 import path from 'node:path'
 import process from 'node:process'
-import { fileURLToPath } from 'node:url'
 import { chromium } from 'playwright-core'
 
-const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
+// Match Hexo's working directory even when tools/ is a Windows junction.
+const projectRoot = path.resolve(process.env.INIT_CWD || process.cwd())
 const managedSiteUrl = 'http://127.0.0.1:4101'
 const siteUrl = process.env.HAN_SITE_URL || managedSiteUrl
 const screenshotDirectory = process.env.HAN_SCREENSHOT_DIR
@@ -164,6 +164,9 @@ async function runBrowserChecks() {
     await page.keyboard.press(process.platform === 'darwin' ? 'Meta+K' : 'Control+K')
     await page.locator('#local-search .local-search-input input').waitFor({ state: 'visible' })
     const searchInput = page.locator('#local-search .local-search-input input')
+    assert(Boolean(await searchInput.getAttribute('aria-label')), '搜索输入框缺少可访问名称')
+    assert(Boolean(await page.locator('.search-close-button').getAttribute('aria-label')), '搜索关闭按钮缺少可访问名称')
+    await page.waitForFunction(() => document.activeElement === document.querySelector('.local-search-input input'))
     await searchInput.fill('开篇寄语')
     await page.waitForFunction(() => document.querySelectorAll('.local-search-hit-item').length === 1)
     assert((await page.locator('#local-search-results').innerText()).includes(welcomePostTitle), '搜索“开篇寄语”没有返回首篇文章')
@@ -178,6 +181,7 @@ async function runBrowserChecks() {
     assert((await page.locator('#local-search-stats').innerText()).includes(emptyQuery), '搜索没有正确显示无结果状态')
     await page.keyboard.press('Escape')
     await page.locator('#local-search .search-dialog').waitFor({ state: 'hidden' })
+    assert(await page.locator('#search-button > .search').evaluate(el => document.activeElement === el), '关闭搜索后焦点未回到搜索入口')
 
     const originalTheme = await page.locator('html').getAttribute('data-theme')
     await page.evaluate(() => document.getElementById('darkmode').click())
@@ -194,7 +198,7 @@ async function runBrowserChecks() {
     assert(await page.locator('#article-container .headerlink').count() === 7, '文章标题锚点数量不正确')
     assert(await page.locator('#card-toc .toc-content').count() === 1, '文章页没有生成目录')
     assert(await page.locator('#post-comment').count() === 1, '文章页没有评论容器')
-    assert((await page.locator('#article-container').innerText()).includes('所有内容全部来源于真实项目、真实调试、真实竞赛经历。'), '文章正文缺少原文关键句')
+    assert((await page.locator('#article-container').innerText()).includes('后续文章以完成实测的项目为基础'), '文章正文缺少实测项目写作原则')
     if (screenshotDirectory) await page.screenshot({ path: path.join(screenshotDirectory, 'han-tax-article-desktop.png'), fullPage: true })
 
     await checkPowerArticle(page, 'desktop')
@@ -267,6 +271,29 @@ async function runBrowserChecks() {
     const talksText = await page.locator('#qexot').innerText()
     assert(talksText.includes('Browser smoke test'), `说说后台更新未正确显示，实际内容：${talksText}`)
 
+    await page.unroute('https://api.han.tax/pub/talks/**')
+    await page.route('https://api.han.tax/pub/talks/**', route => route.fulfill({ status: 503, body: 'Unavailable' }))
+    await page.reload({ waitUntil: 'load' })
+    await page.waitForFunction(() => !document.querySelector('#qexot').hasAttribute('aria-busy'))
+    assert(await page.locator('.han-talk-item').count() === 1, '接口失败时丢失了已有缓存')
+    assert(await page.locator('#qexot').getAttribute('data-state') === 'stale', '缓存更新失败没有显示过期状态')
+    await page.evaluate(() => localStorage.removeItem('han-tax-talks-v1'))
+    await page.reload({ waitUntil: 'load' })
+    await page.waitForFunction(() => !document.querySelector('#qexot').hasAttribute('aria-busy'))
+    assert(await page.locator('#qexot').getAttribute('data-state') === 'error', '接口失败被错误地显示成没有说说')
+    const retry = page.getByRole('button', { name: '重试', exact: true })
+    assert(await retry.count() === 1, '说说加载失败缺少重试入口')
+    await page.unroute('https://api.han.tax/pub/talks/**')
+    let finishTalks
+    await page.route('https://api.han.tax/pub/talks/**', async route => {
+      await new Promise(resolve => { finishTalks = resolve })
+      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ status: true, count: 0, data: [] }) })
+    })
+    await Promise.all([page.waitForRequest('https://api.han.tax/pub/talks/**'), retry.click()])
+    assert(await page.locator('#qexot').getAttribute('data-state') === 'loading', '重试请求期间没有加载状态')
+    finishTalks()
+    await page.waitForFunction(() => document.querySelector('#qexot').dataset.state === 'empty')
+
     assert(pageErrors.length === 0, `页面 JavaScript 错误：${pageErrors.join(' | ')}`)
     await context.close()
   } finally {
@@ -317,6 +344,8 @@ async function checkPowerArticle(page, viewportName) {
     await img.scrollIntoViewIfNeeded()
     await img.evaluate(el => el.decode())
     assert(Boolean(await img.getAttribute('alt')), '电源文章图片缺少 alt')
+    const size = await img.evaluate(el => ({ width: Number(el.getAttribute('width')), height: Number(el.getAttribute('height')), naturalWidth: el.naturalWidth, naturalHeight: el.naturalHeight, ratio: el.getBoundingClientRect().width / el.getBoundingClientRect().height }))
+    assert(size.width > 0 && size.height > 0 && Math.abs(size.ratio - size.naturalWidth / size.naturalHeight) < 0.02, `图片预留尺寸或显示比例异常：${JSON.stringify(size)}`)
   }
   const state = await page.evaluate(() => ({
     overflow: document.documentElement.scrollWidth > innerWidth + 1,
@@ -328,6 +357,30 @@ async function checkPowerArticle(page, viewportName) {
   assert(!state.overflow && !state.broken, `电源文章溢出或图片加载失败：${JSON.stringify(state)}`)
   assert(state.h2Size - state.h3Size >= 7, `电源文章标题层级不足：${JSON.stringify(state)}`)
   assert(state.anchorsValid, '电源文章目录存在失效锚点')
+  const originalTheme = await page.locator('html').getAttribute('data-theme')
+  for (const theme of ['light', 'dark']) {
+    await page.evaluate(async value => {
+      document.documentElement.setAttribute('data-theme', value)
+      getComputedStyle(document.querySelector('#post')).backgroundColor
+      await Promise.all(document.getAnimations().filter(animation => animation instanceof CSSTransition).map(animation => animation.finished.catch(() => {})))
+    }, theme)
+    const lowContrast = await page.evaluate(() => {
+      const luminance = color => {
+        const rgb = color.match(/[\d.]+/g).slice(0, 3).map(Number).map(v => {
+          v /= 255
+          return v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4
+        })
+        return rgb[0] * 0.2126 + rgb[1] * 0.7152 + rgb[2] * 0.0722
+      }
+      const bg = luminance(getComputedStyle(document.querySelector('#post')).backgroundColor)
+      return [...document.querySelectorAll('#article-container .img-alt, #article-container a[href^="http"]')].filter(el => {
+        const fg = luminance(getComputedStyle(el).color)
+        return (Math.max(bg, fg) + 0.05) / (Math.min(bg, fg) + 0.05) < 4.5
+      }).map(el => el.textContent.slice(0, 50))
+    })
+    assert(!lowContrast.length, `${theme} 模式正文链接或图注对比度不足：${lowContrast.join('、')}`)
+  }
+  await page.evaluate(value => value ? document.documentElement.setAttribute('data-theme', value) : document.documentElement.removeAttribute('data-theme'), originalTheme)
   const equations = page.locator('#article-container .han-equation')
   assert(await equations.count() === 12, '公式未完整渲染')
   assert(await page.locator('#article-container figure.highlight').count() === 0, '非代码内容仍显示代码面板')

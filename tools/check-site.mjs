@@ -2,9 +2,9 @@ import { access, readdir, readFile } from 'node:fs/promises'
 import path from 'node:path'
 import process from 'node:process'
 import katex from 'katex'
-import { fileURLToPath } from 'node:url'
 
-const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
+// npm runs at the project root; tools/ may be a Windows junction on another drive.
+const projectRoot = path.resolve(process.env.INIT_CWD || process.cwd())
 const publicRoot = path.join(projectRoot, 'public')
 const sourceRoot = path.join(projectRoot, 'source')
 const welcomePostPath = '/posts/welcome-and-roadmap/'
@@ -73,29 +73,18 @@ const forbiddenGeneratedMarkers = [
   'embedded-hardware-project-template'
 ]
 
-const requiredOriginalArticleFragments = [
-  '大家好，欢迎来到我的个人技术博客。',
-  '本站依托 OpenAI Agent + Codex 技术辅助从零搭建完成，是我个人专属的技术沉淀、项目复盘、成长记录与经验输出阵地。搭建这个博客的初衷很简单：把零散的学习过程系统化，把踩过的坑记录下来，把积累的技术沉淀输出出去。',
-  '未来本站将长期聚焦嵌入式硬件开发核心赛道，持续输出高质量、可落地、真实项目向的技术内容。',
-  '## 本站主要内容方向',
-  '### 1. 嵌入式硬件开发实战',
-  'STM32、外设驱动、RTOS 实时系统、多任务架构、控制算法、底层逻辑调试等嵌入式核心技术复盘，全部基于真实项目与工程场景。',
-  '### 2. PCB设计、硬件调试与排坑经验',
-  '原理图绘制、Layout布线规范、阻抗匹配、电源设计、硬件故障排查、焊接调试、量产思维，记录硬件工程师最真实的踩坑与复盘。',
-  '### 3. 学科竞赛完整复盘',
-  '电赛、智能车、嵌赛、西门子杯等工科主流竞赛的备赛思路、架构设计、代码逻辑、控参优化、避坑指南、获奖经验总结。',
-  '### 4. 项目实战与技术积累',
-  '从零基础入门到进阶工程思维，记录完整的学习路径、项目迭代过程、技术难点拆解、底层逻辑理解，拒绝碎片化水文，只输出可复用、可借鉴的干货内容。',
-  '### 5. 工科学习、成长与就业思考',
-  '记录自己在工科学习、技术深耕、竞赛内卷、求职认知、行业趋势中的真实感悟，沉淀属于自己的工程思维与职业认知体系。',
-  '## 建站初衷与未来展望',
-  '技术的成长，从来不是靠看过多少视频、刷过多少知识点，而是复盘、沉淀、输出、迭代。',
-  '过去的学习大多停留在“输入”，知识零散、容易遗忘、不成体系。搭建这个博客，就是为了倒逼自己：每一次学习、每一次调板、每一次竞赛备赛、每一次踩坑，都要有沉淀、有记录、有输出。',
-  '未来我会保持长期更新，坚持真实、落地、硬核、原创的内容风格。',
-  '不堆砌理论，不写空话套话，所有内容全部来源于真实项目、真实调试、真实竞赛经历。',
-  '希望通过持续输出，构建属于自己的技术知识库与成长体系，让每一步学习都有痕迹，每一次努力都能复利。',
-  '慢慢积累、稳步向上，为未来的技术深耕、项目进阶、学业提升、就业发展铺好每一级台阶。',
-  '也希望我的分享，能够帮到正在嵌入式路上努力的同行者，互相成长、共同进步。'
+const requiredWelcomeArticleFragments = [
+  "大家好，欢迎来到我的个人技术博客。",
+  "这个博客将专注于开关电源的设计、调试与测试。",
+  "## 本站主要内容方向",
+  "### 1. 设计指标与参数计算",
+  "### 2. 磁性元件与功率器件",
+  "### 3. 反馈控制与动态响应",
+  "### 4. 原理图与 PCB 设计",
+  "### 5. 调试过程与实测验证",
+  "## 写作原则与后续更新",
+  "后续文章以完成实测的项目为基础",
+  "计算、仿真与实测会分别说明"
 ]
 
 async function exists(filePath) {
@@ -141,10 +130,10 @@ if (postFiles.length !== expectedPostSources.length || expectedPostSources.some(
 
 const welcomePostSource = await readFile(expectedPostSource, 'utf8')
 let fragmentCursor = 0
-for (const fragment of requiredOriginalArticleFragments) {
+for (const fragment of requiredWelcomeArticleFragments) {
   const fragmentIndex = welcomePostSource.indexOf(fragment, fragmentCursor)
   if (fragmentIndex === -1) {
-    problems.push(`首篇文章原文缺失或顺序改变: ${JSON.stringify(fragment)}`)
+    problems.push(`首篇文章定位或章节缺失: ${JSON.stringify(fragment)}`)
   } else {
     fragmentCursor = fragmentIndex + fragment.length
   }
@@ -195,7 +184,7 @@ const requiredHomeMarkers = [
   ['键盘与无障碍增强脚本', '/js/site-enhancements.js'],
   ['电源文章标题', powerPostTitle],
   ['电源文章地址', powerPostPath],
-  ['新版自定义样式', '/css/custom.css?v=20260915-5']
+  ['新版自定义样式', '/css/custom.css?v=20261011-1']
 ]
 
 for (const [label, marker] of requiredHomeMarkers) {
@@ -218,6 +207,7 @@ if (homePostCards.length !== expectedPostSources.length) problems.push(`首页�
 const searchXml = await readFile(path.join(publicRoot, 'search.xml'), 'utf8')
 const atomXml = await readFile(path.join(publicRoot, 'atom.xml'), 'utf8')
 const sitemapXml = await readFile(path.join(publicRoot, 'sitemap.xml'), 'utf8')
+if (/<loc>[^<]*\/404(?:\.html)?\/?<\/loc>/.test(sitemapXml)) problems.push('404 错误页不应进入 sitemap')
 for (const [label, content] of [['search.xml', searchXml], ['atom.xml', atomXml], ['sitemap.xml', sitemapXml]]) {
   if (!content.includes(welcomePostPath)) problems.push(`${label} 缺少首篇文章地址: ${welcomePostPath}`)
   if (!content.includes(powerPostPath)) problems.push(`${label} 缺少电源文章地址: ${powerPostPath}`)
@@ -229,6 +219,9 @@ if (!archiveHtml.includes(welcomePostTitle) || !archiveHtml.includes(welcomePost
 if (!archiveHtml.includes(powerPostTitle) || !archiveHtml.includes(powerPostPath)) problems.push('归档页缺少电源文章')
 
 const powerHtml = await readFile(path.join(publicRoot, 'posts/lm2596-ams1117-design/index.html'), 'utf8')
+for (const tag of powerHtml.match(/<img\b[^>]*\bsrc=["']\/images\/posts\/[^>]*>/g) || []) {
+  if (!/\bwidth=["']\d+["']/.test(tag) || !/\bheight=["']\d+["']/.test(tag)) problems.push('正文图片缺少预留尺寸：' + tag.slice(0, 180))
+}
 if (!powerHtml.includes(powerPostTitle)) problems.push('电源文章标题不正确')
 if (!powerHtml.includes('id="前言"')) problems.push('电源文章缺少“前言”锚点')
 if ((powerHtml.match(/<h2\b/g) || []).length !== 11) problems.push('电源文章二级标题数量不正确')
@@ -243,7 +236,7 @@ if (/src=["']lm2596-ams1117-design\//.test(powerHtml)) problems.push('电源文�
 if (!powerHtml.includes('name="description"') || !powerHtml.includes('name="keywords"')) problems.push('电源文章缺少 SEO 元数据')
 
 const articleHtml = await readFile(path.join(publicRoot, 'posts', 'welcome-and-roadmap', 'index.html'), 'utf8')
-if (!articleHtml.includes('id="本站主要内容方向"') || !articleHtml.includes('id="建站初衷与未来展望"')) problems.push('文章页缺少两个二级标题锚点')
+if (!articleHtml.includes('id="本站主要内容方向"') || !articleHtml.includes('id="写作原则与后续更新"')) problems.push('文章页缺少两个二级标题锚点')
 const levelThreeHeadings = articleHtml.match(/<h3\b/g) || []
 if (levelThreeHeadings.length !== 5) problems.push(`文章页应包含 5 个三级标题，实际为 ${levelThreeHeadings.length}`)
 
@@ -287,4 +280,4 @@ if (problems.length > 0) {
   process.exit(1)
 }
 
-console.log(`站点检查通过：${htmlFiles.length} 个 HTML 页面，${requiredOutputs.length} 个必需产物；首篇原文、座右铭、归档、Search、Atom 与旧内容清理规则均已验证。`)
+console.log(`站点检查通过：${htmlFiles.length} 个 HTML 页面，${requiredOutputs.length} 个必需产物；首篇定位、座右铭、归档、Search、Atom 与旧内容清理规则均已验证。`)

@@ -138,33 +138,58 @@
     }
   }
 
-  const cachedTalks = readCache()
-  if (cachedTalks) renderTalks(cachedTalks)
-  else renderEmpty()
+  let cachedTalks = readCache()
+  let pending = false
+  const showStatus = (message, retry = false) => {
+    container.querySelector('.han-talks-notice')?.remove()
+    const status = document.createElement('p')
+    status.className = 'han-talks-status han-talks-notice'
+    status.append(document.createTextNode(message))
+    if (retry) {
+      const button = document.createElement('button')
+      button.type = 'button'
+      button.className = 'han-talks-retry'
+      button.textContent = '重试'
+      button.addEventListener('click', loadTalks)
+      status.append(' ', button)
+    }
+    container.append(status)
+  }
 
-  if (!endpoint) return
-
-  const controller = new AbortController()
-  const timeout = window.setTimeout(() => controller.abort(), 8_000)
-  container.setAttribute('aria-busy', 'true')
-
-  fetch(endpoint, { signal: controller.signal })
-    .then(response => {
+  async function loadTalks() {
+    if (pending) return
+    pending = true
+    if (cachedTalks) renderTalks(cachedTalks)
+    else {
+      container.replaceChildren()
+      container.dataset.state = 'loading'
+    }
+    showStatus(cachedTalks ? '正在更新说说…' : '正在加载说说…')
+    container.setAttribute('aria-busy', 'true')
+    const controller = new AbortController()
+    const timeout = window.setTimeout(() => controller.abort(), 8_000)
+    try {
+      if (!endpoint) throw new Error('Missing talks endpoint')
+      const response = await fetch(endpoint, { signal: controller.signal })
       if (!response.ok) throw new Error(`HTTP ${response.status}`)
-      return response.json()
-    })
-    .then(result => {
+      const result = await response.json()
       if (!result.status || !Array.isArray(result.data)) throw new Error('Invalid talks response')
+      cachedTalks = result.data
       try {
         window.localStorage.setItem(cacheKey, JSON.stringify({ savedAt: Date.now(), data: result.data }))
       } catch {}
       renderTalks(result.data)
-    })
-    .catch(() => {
-      if (!cachedTalks) renderEmpty()
-    })
-    .finally(() => {
+    } catch {
+      if (cachedTalks) renderTalks(cachedTalks)
+      else container.replaceChildren()
+      container.dataset.state = cachedTalks ? 'stale' : 'error'
+      showStatus(cachedTalks ? '更新失败，当前显示上次保存的内容。' : '说说加载失败，请检查网络后重试。', true)
+    } finally {
       window.clearTimeout(timeout)
       container.removeAttribute('aria-busy')
-    })
+      pending = false
+    }
+  }
+
+  loadTalks()
 })()
