@@ -1,0 +1,56 @@
+name: Backup and restore verification
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Weekly Monday 03:23 China Standard Time (Sunday 19:23 UTC).
+    - cron: '23 19 * * 0'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: han-backup
+  cancel-in-progress: false
+
+jobs:
+  backup:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          path: source-repo
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          repository: lilinhan24-lab/lilinhan24-lab.github.io
+          ref: main
+          path: published-repo
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Back up Git history and verify independent restoration
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir backup
+          for repository in source-repo published-repo; do
+            git -C "$repository" bundle create "$GITHUB_WORKSPACE/backup/$repository.bundle" --all
+            git -C "$repository" bundle verify "$GITHUB_WORKSPACE/backup/$repository.bundle"
+            git clone --no-checkout "$GITHUB_WORKSPACE/backup/$repository.bundle" "$RUNNER_TEMP/restore-$repository"
+            test "$(git -C "$repository" rev-parse HEAD)" = "$(git -C "$RUNNER_TEMP/restore-$repository" rev-parse HEAD)"
+            git -C "$RUNNER_TEMP/restore-$repository" fsck --full
+            printf '%s %s\n' "$repository" "$(git -C "$repository" rev-parse HEAD)" >> backup/commits.txt
+          done
+          cd backup
+          sha256sum ./*.bundle > SHA256SUMS
+      - uses: actions/upload-artifact@v4
+        with:
+          name: site-backup-${{ github.run_id }}
+          path: backup/
+          if-no-files-found: error
+          retention-days: 30
+          compression-level: 0
