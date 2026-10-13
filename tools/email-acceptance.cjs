@@ -18,4 +18,8 @@ async function main() {
   if (!manifest.posts.length) throw new Error('没有验收文章')
   console.log(JSON.stringify(await acceptance({request,email,phase:process.argv[2],config,post:manifest.posts[0]})))
 }
-main().catch(() => { console.error('验收停止：请核对订阅状态、隔离名单和服务商活动记录；不自动重试发送。'); process.exitCode=1 })
+main().catch(error => {
+  const known = /^(验收服务返回 HTTP \d+|验收阶段无效|联系人状态无法核实|验收邮箱尚未确认订阅|名单返回异常|名单分页异常|名单文件夹无效|隔离名单无效|不得使用正式名单验收|隔离名单不只包含已确认的验收邮箱，停止发送|历史活动无效|历史活动分页异常|活动创建结果异常|不是用户指定的验收邮箱|缺少发信密钥|正式文章清单不可读|没有验收文章)$/
+  console.error(`验收停止：${known.test(error.message) ? error.message : '无法完成本次请求'}；不自动重试发送。`)
+  process.exitCode=1
+})
