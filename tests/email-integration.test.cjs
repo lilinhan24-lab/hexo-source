@@ -28,6 +28,25 @@ test('订阅未启用时不生成页面，不向文章与页脚插入入口', ()
   assert.equal(site.addSubscriptionLinks(html, config), html)
 })
 
+test('暂停订阅时仅保留状态页，不加载表单或邀请订阅', () => {
+  const paused = { ...config, enabled: true, paused: true }
+  const page = site.subscriptionRoutes(paused)[0]
+  assert.match(page.data.content, /data-han-subscription-paused/)
+  assert.doesNotMatch(page.data.content, /<iframe|<form|sibforms\.com/)
+  const html = site.addSubscriptionLinks('<head></head><div class="post-copyright"></div><footer></footer>', paused)
+  assert.match(html, /邮件订阅（暂停）/)
+  assert.doesNotMatch(html, /想收到后续文章/)
+  assert.equal((html.match(/href="\/subscribe\/"/g) || []).length, 1)
+})
+
+test('暂停时正式和测试发送都在联网前终止，本地预演仍可使用', async t => {
+  const root = fixture(t)
+  fs.writeFileSync(path.join(root, 'email/config.json'), JSON.stringify({ ...config, enabled: true, paused: true }))
+  const options = { root, env: { HAN_EMAIL_SEND_ENABLED: 'true', BREVO_API_KEY: 'test-only' }, fetchImpl: () => { throw new Error('must not fetch') } }
+  for (const mode of ['send', 'test']) await assert.rejects(runner.execute({ ...options, args: [mode] }), /暂停/)
+  assert.equal((await runner.execute({ ...options, args: [] })).mode, 'dry-run')
+})
+
 test('启用后页面明确确认和退订方式，入口不重复，不泄露技术文件', () => {
   assert.equal(typeof site.subscriptionRoutes, 'function')
   const enabled = { ...config, enabled: true }
