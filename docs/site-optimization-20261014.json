@@ -13,8 +13,8 @@
     "手机正文 16px，首页背景 380–440px，减少首屏留白",
     "尊重系统减少动画设置，修正版权区和标签链接对比度",
     "发布保护检查定位、订阅入口、noindex、预览样式及疑似发信密钥",
-    "43 项单元测试通过；整站生成 119 文件、16 HTML 页面检查通过",
-    "完整桌面及手机尺寸浏览器回归通过；实际 Android 手机尚未验收",
+    "第一批 43 项单元测试通过；新增维护提醒测试后共 46 项；整站生成 119 文件、16 HTML 页面检查通过",
+    "正式站完整桌面及手机尺寸浏览器回归通过；用户反馈 Android 上 QQ 邮箱订阅、收信和确认正常",
     "文章区自动无障碍检测未发现确定违规，仍有需人工判读的项目"
   ],
   "backups": {
@@ -33,7 +33,10 @@
     "action": "已核验清理缓存实现并通过后台清理可重建缓存，未提交文章或改动密钥",
     "verifiedResult": "后台提示清除全部缓存成功；文章列表重新显示 lm2596-ams1117-design、welcome-and-roadmap 及原有 embedded-hardware-project-template 草稿",
     "warning": "仪表盘最近文章来自独立 PostModel 记录，不能仅凭该区域判断 Git 仓库文章是否存在",
-    "remaining": "后台升级、数据库备份、访问保护和自动缓存刷新仍待核验"
+    "databaseBackup": "MongoDB qexo 库已导出，并完成 mongorestore --dryRun 无写入结构检查；未向生产库回灌",
+    "credentialMigration": "生产部署已切换为仅有 test 和 qexo 库读写权限的服务账号；旧管理员密码轮换后，后台登录和三篇文章列表复查通过",
+    "deployment": "https://vercel.com/lilinhan24-labs-projects/my-qexo/DsSJiDRo59ShwUJDoWtLhf4Nxj9t",
+    "remaining": "后台版本升级、数据库自动备份、访问保护和自动缓存刷新仍待处理"
   },
   "release": {
     "sourceCommit": "490ee19472a120b01efb0e21374870778e97f3fa",
@@ -46,12 +49,58 @@
     "contentProtection": "文章正文文本与发布前一致，6 张原图字节不变；通知清单与发布前及线上一致，不因本轮样式优化产生文章更新通知",
     "dependencyAudit": "0 critical，10 high、2 moderate（含依赖链）；按项目现有 critical 阈值通过，不等于无漏洞"
   },
+  "maintenance": {
+    "sourceCommit": "cd6d1bc566b0b6f9791fedccead88f72ee608c11",
+    "cloudBuild": "https://github.com/lilinhan24-lab/hexo-source/actions/runs/38435274069",
+    "backupSchedule": "每周一北京时间 03:23，GitHub Actions；计划触发时间不保证准点",
+    "backupScope": "源码仓库及发布仓库的 Git 历史；不包含数据库和订阅联系人",
+    "firstBackupRun": "https://github.com/lilinhan24-lab/hexo-source/actions/runs/38435297432",
+    "firstBackupVerification": "云端生成两个 Git bundle，分别 verify、独立 clone、比较 HEAD、git fsck 和计算校验值通过",
+    "artifact": "site-backup-38435297432",
+    "artifactBytes": 11401359,
+    "retentionDays": 30,
+    "failureAlerts": "构建、文章通知或备份失败时，在源码仓库创建或更新同一类故障 Issue；正常运行跳过",
+    "failureAlertVerification": "3 项行为测试通过；成功任务触发后提醒任务正确跳过；未人为制造线上故障，未验收邮件或手机提醒送达",
+    "notificationManualRun": "https://github.com/lilinhan24-lab/hexo-source/actions/runs/38435301232",
+    "notificationManualResult": "success，sent: []，没有重复通知",
+    "notificationScheduledRun": "https://github.com/lilinhan24-lab/hexo-source/actions/runs/38436468162",
+    "notificationScheduledResult": "event=schedule，2026-10-14 北京时间 01:10:11 触发，completed/success；证明定时调度实际运行，不代表 QQ 新文章通知和退订已验收"
+  },
+  "realDeviceAcceptance": {
+    "source": "用户反馈：正常",
+    "passed": "Android 打开正式订阅页、向本人 QQ 邮箱发送确认邮件并完成确认、页面显示",
+    "notCovered": "QQ 新文章通知、文章更新通知、退订链路及订阅反滥用"
+  },
+  "commentBackend": {
+    "provider": "Vercel",
+    "project": "my-plq",
+    "domain": "https://comment.han.tax/",
+    "databaseProvider": "MongoDB Atlas",
+    "database": "test",
+    "runtime": "1.7.4",
+    "dependencyFix": "发现原配置使用 latest，重新部署曾拉取 2.0.13；已固定回原 1.7.4 并提交 package-lock.json，安装版本回归测试先失败后通过",
+    "sourceCommit": "5b71947",
+    "deployment": "https://vercel.com/lilinhan24-labs-projects/my-plq/GHpXSRWxDUVcXbsQeooSpU6NXySu",
+    "verification": "云端部署 success；正式域名 HTTP 200 并返回版本 1.7.4；COMMENT_GET 只读查询成功；整站浏览器回归通过；旧管理员密码轮换后，新服务账号再次读取历史评论，仍为 8 条",
+    "configurationAudit": "现有配置文档只有 ADMIN_PASS；未发现已配置的反垃圾和邮件通知参数，不等于这些功能已验收",
+    "dataBackup": "导出 comment 8 条、counter 8 条、config 1 条，mongorestore --dryRun 通过；没有向生产库执行恢复写入"
+  },
+  "privateDatabaseBackups": {
+    "location": "本机 LOCALAPPDATA/han-blog-private-backups/20261014，非公开仓库目录",
+    "access": "目录访问限当前 Windows 用户和 SYSTEM；数据库备份含敏感配置，不可公开上传",
+    "files": {
+      "twikoo-test.archive.gz": "7de280c8964d288bf42d7bd72aba99d2bb9526f87ae86003abe46ed1fcf66965",
+      "qexo-verified-source.archive.gz": "0dc9417bb21d41183bce700a18818fffc662c8ba037625245c287a8716174e8b"
+    },
+    "credentialStorage": "服务账号及轮换后的管理员恢复凭据使用 Windows DPAPI 加密保存在同一受限目录；未写入代码仓库",
+    "rotation": "浏览器控件读取曾意外回显旧连接串，已轮换旧管理员密码；实测旧密码认证被拒绝，新服务账号查询成功",
+    "legacyDecision": "用户确认旧测试项目不再使用，允许旧凭据失效；没有删除这些项目或数据库"
+  },
   "remaining": [
-    "QQ 邮箱送达、Android 真机、中文退订页和订阅反滥用验收",
-    "Twikoo 托管平台、反垃圾、邮件及数据库备份核验",
+    "QQ 新文章及更新通知、中文退订页和订阅反滥用验收；QQ 确认邮件及 Android 订阅页面已由用户验收",
+    "Twikoo 反垃圾、邮件通知、数据库自动备份与实际恢复演练；托管平台和本地备份已核实",
     "依赖审计存在上游未修复报告，不宣称漏洞清零",
-    "GitHub 通知 cron 已配置，但当前只查到一次成功手动执行，定时实际触发仍待核验",
-    "异常提醒、自动备份、账号权限及 CSP 进一步加固",
+    "故障提醒真实失败演练、Vercel 双重验证和 CSP 加固；Vercel 页面明确提示单因素认证，GitHub 双重验证状态尚无法核实",
     "搜索平台验证与收录提交；不保证搜索引擎最终收录"
   ]
 }
