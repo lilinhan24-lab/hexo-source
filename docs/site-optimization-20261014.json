@@ -36,7 +36,7 @@
     "databaseBackup": "MongoDB qexo 库已导出，并完成 mongorestore --dryRun 无写入结构检查；未向生产库回灌",
     "credentialMigration": "生产部署已切换为仅有 test 和 qexo 库读写权限的服务账号；旧管理员密码轮换后，后台登录和三篇文章列表复查通过",
     "deployment": "https://vercel.com/lilinhan24-labs-projects/my-qexo/DsSJiDRo59ShwUJDoWtLhf4Nxj9t",
-    "remaining": "后台版本升级、数据库自动备份、访问保护和自动缓存刷新仍待处理"
+    "remaining": "后台版本升级、访问保护和自动缓存刷新仍待处理；数据库每日加密备份及隔离恢复演练已在本轮收尾完成"
   },
   "release": {
     "sourceCommit": "490ee19472a120b01efb0e21374870778e97f3fa",
@@ -69,7 +69,10 @@
   "realDeviceAcceptance": {
     "source": "用户反馈：正常",
     "passed": "Android 打开正式订阅页、向本人 QQ 邮箱发送确认邮件并完成确认、页面显示",
-    "notCovered": "QQ 新文章通知、文章更新通知、退订链路及订阅反滥用"
+    "notCovered": "QQ 新文章通知、文章更新通知、退订链路及订阅反滥用",
+    "latestProviderCheck": "2026-10-14 再次查询用户指定 QQ 联系人时，Brevo 返回 404；此前用户反馈的确认成功与当前服务商状态尚未对上，已请用户重新确认订阅，不据此宣称跨邮箱验收完成",
+    "isolatedAcceptance": "新增仅手动触发的独立邮箱验收工作流：固定用户指定邮箱指纹、隔离名单、重复活动不再发送、不清除退订状态；目前在联系人查询阶段停止，未发出验收邮件",
+    "latestAcceptanceRun": "https://github.com/lilinhan24-lab/hexo-source/actions/runs/38444075316"
   },
   "commentBackend": {
     "provider": "Vercel",
@@ -82,8 +85,25 @@
     "sourceCommit": "5b71947",
     "deployment": "https://vercel.com/lilinhan24-labs-projects/my-plq/GHpXSRWxDUVcXbsQeooSpU6NXySu",
     "verification": "云端部署 success；正式域名 HTTP 200 并返回版本 1.7.4；COMMENT_GET 只读查询成功；整站浏览器回归通过；旧管理员密码轮换后，新服务账号再次读取历史评论，仍为 8 条",
-    "configurationAudit": "现有配置文档只有 ADMIN_PASS；未发现已配置的反垃圾和邮件通知参数，不等于这些功能已验收",
-    "dataBackup": "导出 comment 8 条、counter 8 条、config 1 条，mongorestore --dryRun 通过；没有向生产库执行恢复写入"
+    "configurationAudit": "最初配置只有 ADMIN_PASS；现已配置安全域名和持久化发言限流，并增加提交入口检查；未配置 CAPTCHA、第三方内容识别和评论邮件通知",
+    "submissionProtection": "每个 IP 每 10 分钟最多 5 条，全站每 10 分钟最多 50 条；内容最多 2000 字符、最多 8 个 HTTP(S) 链接、昵称最多 50 字符；站外浏览器来源的提交拒绝。来源限制不能替代身份验证或防机器人服务",
+    "liveAcceptance": "正式接口实测中文评论提交、回复和读取成功；过长内容、异常来源、超过频率的提交被拒绝；仅清理 5 条本轮临时测试评论，8 条历史评论未修改；整站桌面及手机尺寸浏览器回归通过",
+    "latestDeployment": "https://vercel.com/lilinhan24-labs-projects/my-plq/BaARMijHRetkKALQcHhV45GaqCvb",
+    "dataBackup": "本机初始导出与 dry-run 保留；后续私有仓库已实现每日加密备份和隔离数据库实际恢复比对，未向生产库执行恢复写入"
+  },
+  "databaseBackupCloseout": {
+    "repository": "私有仓库 lilinhan24-lab/my-plq",
+    "sourceCommit": "b962094",
+    "schedule": "每日北京时间 04:41，GitHub Actions；允许调度延迟，首次定时触发尚待观察",
+    "retentionDays": 30,
+    "encryption": "AES-256-GCM；只上传密文和不含敏感数据的验收摘要，不上传明文导出",
+    "verification": "导出两个指定生产库，先加密再解密，将解密结果恢复到仅监听临时运行器回环地址的 MongoDB；逐文档哈希、索引定义、集合选项全部比对通过",
+    "run": "https://github.com/lilinhan24-lab/my-plq/actions/runs/38443970158",
+    "result": "success，2 个库、23 个集合、186 份文档；数量为该次快照，并非固定容量",
+    "sha256": "3420eefc98d7c54236bd40681e6a24569fee5167d09372fe3976830d881a5273",
+    "localRecoveryTest": "已下载首次成功的云端加密产物，使用本机 DPAPI 恢复密钥成功解密；解包拒绝覆盖原目录及路径穿越",
+    "failureAlert": "演练期间实际失败触发了私有仓库故障 Issue；修正容器健康检查参数与索引列表顺序比对后验证通过，故障 Issue 已关闭",
+    "limits": "这是低写入量博客的集合级逻辑备份，不提供跨集合事务时间点一致性；本机 DPAPI 恢复密钥需在重装系统前迁入独立密码管理器或离线介质；备份账号沿用仅两个库读写权限的服务账号，不是专用只读账号"
   },
   "privateDatabaseBackups": {
     "location": "本机 LOCALAPPDATA/han-blog-private-backups/20261014，非公开仓库目录",
@@ -98,7 +118,7 @@
   },
   "remaining": [
     "QQ 新文章及更新通知、中文退订页和订阅反滥用验收；QQ 确认邮件及 Android 订阅页面已由用户验收",
-    "Twikoo 反垃圾、邮件通知、数据库自动备份与实际恢复演练；托管平台和本地备份已核实",
+    "Twikoo 基础限流与输入防护、每日数据库加密备份及实际隔离恢复演练已完成；高级防机器人、内容识别和评论邮件通知未接入",
     "依赖审计存在上游未修复报告，不宣称漏洞清零",
     "故障提醒真实失败演练、Vercel 双重验证和 CSP 加固；Vercel 页面明确提示单因素认证，GitHub 双重验证状态尚无法核实",
     "搜索平台验证与收录提交；不保证搜索引擎最终收录"
