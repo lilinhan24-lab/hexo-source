@@ -5,7 +5,7 @@
     "identity": "开关电源设计、调试与实测",
     "analytics": "用户明确暂不接入访问统计，仅做收录优化",
     "browser": "使用用户已登录的系统默认 Edge，不另开可见 Chrome",
-    "publication": "获准在测试通过后发布；本轮尚未发布"
+    "publication": "本轮优化已通过本地及云端测试并发布，正式域名线上回归通过"
   },
   "localVerified": [
     "照片生成带内容哈希的 WebP 响应式版本，原图保留；电路 PNG 不压缩改写",
@@ -35,8 +35,18 @@
     "warning": "仪表盘最近文章来自独立 PostModel 记录，不能仅凭该区域判断 Git 仓库文章是否存在",
     "remaining": "后台升级、数据库备份、访问保护和自动缓存刷新仍待核验"
   },
+  "release": {
+    "sourceCommit": "490ee19472a120b01efb0e21374870778e97f3fa",
+    "deploymentCommit": "ae509aa",
+    "cloudBuild": "https://github.com/lilinhan24-lab/hexo-source/actions/runs/38433956983",
+    "cloudBuildResult": "success",
+    "liveSite": "https://www.han.tax/",
+    "liveValidation": "正式域名桌面及手机尺寸完整浏览器回归通过；新 CSS、WebP、文章、订阅页、robots.txt 和 sitemap.xml 均 HTTP 200",
+    "screenshots": "artifacts/online-optimization-20261014",
+    "contentProtection": "文章正文文本与发布前一致，6 张原图字节不变；通知清单与发布前及线上一致，不因本轮样式优化产生文章更新通知",
+    "dependencyAudit": "0 critical，10 high、2 moderate（含依赖链）；按项目现有 critical 阈值通过，不等于无漏洞"
+  },
   "remaining": [
-    "正式发布及线上回归",
     "QQ 邮箱送达、Android 真机、中文退订页和订阅反滥用验收",
     "Twikoo 托管平台、反垃圾、邮件及数据库备份核验",
     "依赖审计存在上游未修复报告，不宣称漏洞清零",
