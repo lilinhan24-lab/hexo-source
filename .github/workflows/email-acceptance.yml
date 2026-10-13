@@ -1,0 +1,34 @@
+name: Owner email acceptance
+on:
+  workflow_dispatch:
+    inputs:
+      phase:
+        description: '仅用户已确认的 QQ 邮箱；status 只查状态'
+        type: choice
+        default: status
+        options: [status, new, updated]
+permissions:
+  contents: read
+concurrency:
+  group: han-owner-email-acceptance
+  cancel-in-progress: false
+jobs:
+  acceptance:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --test tests/email-acceptance.test.cjs tests/email-notifications.test.cjs
+      - name: Isolated owner acceptance
+        run: node tools/email-acceptance.cjs "$PHASE"
+        env:
+          PHASE: ${{ inputs.phase }}
+          BREVO_API_KEY: ${{ secrets.BREVO_API_KEY }}
+          HAN_ACCEPTANCE_EMAIL: ${{ secrets.HAN_ACCEPTANCE_EMAIL }}
