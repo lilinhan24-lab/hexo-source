@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "posts": [
+    {
+      "url": "https://www.han.tax/posts/lm2596-ams1117-design/",
+      "title": "LM2596＋AMS1117 两级降压电源设计",
+      "description": "从实验电路的供电需求出发，完成 LM2596＋AMS1117 双路电源板的电路设计、参数计算与 PCB 制作，记录约 12 V、24 V、32 V 输入下的空载输出、两路分别约 0.8 A 带载、0.5 A 持续运行 5 分钟及 12 mVpp 纹波实测。",
+      "published": "2026-09-15T10:16:00.000Z",
+      "revision": "0a7fcd5fffdca04841234585f24f5abf8467ee1fca84c1b2b0ce4c85a50a6b6f"
+    },
+    {
+      "url": "https://www.han.tax/posts/welcome-and-roadmap/",
+      "title": "开篇寄语｜本站介绍与未来内容规划",
+      "description": "专注开关电源设计、调试与测试，以完成实测的项目为基础，分享参数计算、磁性元件、反馈控制、PCB 设计与性能验证中的思考和取舍。",
+      "published": "2026-09-09T14:34:38.000Z",
+      "revision": "f64302cf5abb97062a9efd86bfe065ab06bcd257a00d8746588ee9fafe3d4fd8"
+    }
+  ]
+}

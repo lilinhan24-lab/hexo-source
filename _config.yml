@@ -4,8 +4,8 @@
 
 # Site
 title: 小小林的个人博客
-subtitle: 嵌入式硬件学习与工程实践
-description: 硬件小小林的个人技术博客，记录嵌入式硬件学习、项目实践、竞赛经历与工程复盘。
+subtitle: 开关电源设计、调试与实测
+description: 硬件小小林的个人技术博客，专注开关电源设计、调试与实测，分享参数计算、磁性元件、反馈控制、PCB 设计与项目复盘。
 author: 硬件小小林
 language: zh-CN
 timezone: Asia/Shanghai

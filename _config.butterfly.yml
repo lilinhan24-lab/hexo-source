@@ -278,7 +278,7 @@ aside:
     category: false
   card_author:
     enable: true
-    description: '专注嵌入式硬件学习与工程实践<br><span class="han-motto">逆水行舟，不进则退</span>'
+    description: '专注开关电源设计、调试与实测<br><span class="han-motto">逆水行舟，不进则退</span>'
     button:
       enable: false
       icon:
@@ -286,7 +286,7 @@ aside:
       link:
   card_announcement:
     enable: true
-    content: 记录嵌入式硬件学习、项目、比赛与工程复盘
+    content: 围绕开关电源项目，分享设计依据、工程取舍与实测结果。
   card_recent_post:
     enable: true
     # If set 0 will show all

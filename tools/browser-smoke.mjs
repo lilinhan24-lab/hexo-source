@@ -114,7 +114,10 @@ async function runBrowserChecks() {
     await page.waitForLoadState('load')
     await page.locator('#search-button > .search').waitFor({ state: 'visible' })
 
-    assert(await page.title() === '小小林的个人博客 - 嵌入式硬件学习与工程实践', `首页标题不正确：${await page.title()}`)
+    assert(await page.title() === '小小林的个人博客 - 开关电源设计、调试与实测', `首页标题不正确：${await page.title()}`)
+    assert((await page.locator('.card-info').innerText()).includes('专注开关电源设计、调试与实测'), '作者卡片丢失已确认的开关电源定位')
+    assert(await page.locator('#footer a[href="/subscribe/"]').count() === 1, '页脚缺少邮件订阅入口')
+    assert(await page.locator('a[href$="/atom.xml"]').count() === 0, '不向普通访客展示 XML 入口')
     assert(await page.locator('#site-title').innerText() === '小小林的个人博客', '首页主标题不正确')
     assert(await page.locator('.author-info-name').innerText() === '硬件小小林', '侧栏作者名不正确')
     assert(await page.locator('.han-motto').innerText() === '逆水行舟，不进则退', '侧栏座右铭不正确')

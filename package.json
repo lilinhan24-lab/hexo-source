@@ -13,6 +13,10 @@
     "clean": "hexo clean",
     "deploy": "hexo deploy",
     "server": "hexo server",
+    "test": "node --test tests/*.test.cjs",
+    "email:preview": "node tools/email-notifications.cjs dry-run",
+    "email:templates": "node tools/email-preview.cjs",
+    "email:test": "node tools/email-notifications.cjs test",
     "test:browser": "node tools/browser-smoke.mjs"
   },
   "hexo": {

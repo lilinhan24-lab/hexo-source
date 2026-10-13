@@ -1,0 +1,66 @@
+name: Article email notifications
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'preview 不发信；test 仅测试邮箱；send 正式通知'
+        type: choice
+        default: preview
+        options:
+          - preview
+          - test
+          - send
+  schedule:
+    - cron: '17,47 * * * *'
+
+permissions:
+  contents: read
+
+# Serialize runs; never interrupt an in-flight provider request.
+concurrency:
+  group: han-article-email
+  cancel-in-progress: false
+
+jobs:
+  preview:
+    if: github.event_name == 'workflow_dispatch' && inputs.mode == 'preview'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: npm run check
+      - run: npm run email:preview
+
+  notify:
+    if: >-
+      github.ref == 'refs/heads/main' &&
+      ((github.event_name == 'workflow_dispatch' && inputs.mode == 'test' && vars.HAN_EMAIL_TEST_ENABLED == 'true') ||
+       (vars.HAN_EMAIL_SEND_ENABLED == 'true' &&
+        (github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.mode == 'send'))))
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      # The notification code uses Node built-ins only. Do not give npm install scripts the key.
+      - run: node --test tests/*.test.cjs
+      - name: Test email to owner only
+        if: github.event_name == 'workflow_dispatch' && inputs.mode == 'test'
+        env:
+          BREVO_API_KEY: ${{ secrets.BREVO_API_KEY }}
+        run: node tools/email-notifications.cjs test
+      - name: Notify confirmed subscribers
+        if: github.event_name == 'schedule' || inputs.mode == 'send'
+        env:
+          BREVO_API_KEY: ${{ secrets.BREVO_API_KEY }}
+          HAN_EMAIL_SEND_ENABLED: ${{ vars.HAN_EMAIL_SEND_ENABLED }}
+        run: node tools/email-notifications.cjs send

@@ -34,5 +34,8 @@ jobs:
       - name: Build and validate the generated site
         run: npm run check
 
+      - name: Test notification safeguards without sending email
+        run: npm test
+
       - name: Check for critical dependency vulnerabilities
         run: npm run audit
