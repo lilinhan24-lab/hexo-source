@@ -52,7 +52,7 @@ jobs:
         with:
           node-version: 22
       # The notification code uses Node built-ins only. Do not give npm install scripts the key.
-      - run: node --test tests/*.test.cjs
+      - run: node --test tests/email-notifications.test.cjs tests/email-integration.test.cjs
       - name: Test email to owner only
         if: github.event_name == 'workflow_dispatch' && inputs.mode == 'test'
         env:

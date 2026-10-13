@@ -1,0 +1,29 @@
+/* Keep the established blue palette and heading hierarchy. */
+#post .post-copyright .post-copyright-meta,
+#post .post-copyright .post-copyright-info a,
+#post .tag_share .post-meta__tags {
+  color: var(--han-link-color);
+}
+#post .tag_share .post-meta__tags:hover {
+  color: #fff;
+  background: #0878b5;
+  border-color: #0878b5;
+}
+#article-container a.han-original-image {
+  display: block;
+  text-decoration: none;
+  cursor: zoom-in;
+}
+@media (max-width: 768px) {
+  #page-header.full_page {
+    height: clamp(380px, 50svh, 440px);
+    min-height: 0;
+    background-attachment: scroll;
+  }
+  #post #article-container { font-size: 16px; line-height: 1.8; }
+  #article-container .img-alt { font-size: 0.875em; line-height: 1.7; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto !important; }
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; animation-iteration-count: 1 !important; }
+}

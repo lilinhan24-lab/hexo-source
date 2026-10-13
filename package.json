@@ -8,7 +8,7 @@
   "scripts": {
     "audit": "npm audit --omit=dev --audit-level=critical",
     "build": "hexo generate --bail",
-    "check": "npm run clean && npm run build && node tools/check-site.mjs",
+    "check": "npm run clean && npm run build && node tools/check-site.mjs && node tools/check-release.cjs",
     "check:site": "node tools/check-site.mjs",
     "clean": "hexo clean",
     "deploy": "hexo deploy",
@@ -38,6 +38,7 @@
     "hexo-theme-butterfly": "^5.7.0",
     "hexo-wordcount": "^6.0.1",
     "image-size": "2.0.4",
+    "sharp": "0.35.5",
     "katex": "0.18.7"
   },
   "devDependencies": {

@@ -1,0 +1,47 @@
+{
+  "date": "2026-10-14",
+  "scope": "网站优化，不改写已确认的文章",
+  "decisions": {
+    "identity": "开关电源设计、调试与实测",
+    "analytics": "用户明确暂不接入访问统计，仅做收录优化",
+    "browser": "使用用户已登录的系统默认 Edge，不另开可见 Chrome",
+    "publication": "获准在测试通过后发布；本轮尚未发布"
+  },
+  "localVerified": [
+    "照片生成带内容哈希的 WebP 响应式版本，原图保留；电路 PNG 不压缩改写",
+    "正文图片支持打开原图，电源文章分享图使用实拍图",
+    "手机正文 16px，首页背景 380–440px，减少首屏留白",
+    "尊重系统减少动画设置，修正版权区和标签链接对比度",
+    "发布保护检查定位、订阅入口、noindex、预览样式及疑似发信密钥",
+    "43 项单元测试通过；整站生成 119 文件、16 HTML 页面检查通过",
+    "完整桌面及手机尺寸浏览器回归通过；实际 Android 手机尚未验收",
+    "文章区自动无障碍检测未发现确定违规，仍有需人工判读的项目"
+  ],
+  "backups": {
+    "location": "artifacts/backups/20261014-pre-optimization",
+    "sourceCommit": "02230debba00073d469bcbe968e38a602d78ec70",
+    "deploymentCommit": "bc05497f62df05d64f58030c5570fd3e46da8997",
+    "verification": "两个 bundle verify 均通过；源码包独立 clone 后 HEAD 一致、git fsck 通过",
+    "exclusions": "不包含本轮未提交修改、订阅联系人、Qexo 或 Twikoo 数据库"
+  },
+  "qexo": {
+    "workingEntry": "https://api.han.tax/",
+    "oldDeployment": "旧收藏地址返回 410 Gone；不是登录密码错误",
+    "observedVersion": "4.0.1",
+    "repository": "lilinhan24-lab/hexo-source",
+    "branch": "main",
+    "action": "已核验清理缓存实现并通过后台清理可重建缓存，未提交文章或改动密钥",
+    "verifiedResult": "后台提示清除全部缓存成功；文章列表重新显示 lm2596-ams1117-design、welcome-and-roadmap 及原有 embedded-hardware-project-template 草稿",
+    "warning": "仪表盘最近文章来自独立 PostModel 记录，不能仅凭该区域判断 Git 仓库文章是否存在",
+    "remaining": "后台升级、数据库备份、访问保护和自动缓存刷新仍待核验"
+  },
+  "remaining": [
+    "正式发布及线上回归",
+    "QQ 邮箱送达、Android 真机、中文退订页和订阅反滥用验收",
+    "Twikoo 托管平台、反垃圾、邮件及数据库备份核验",
+    "依赖审计存在上游未修复报告，不宣称漏洞清零",
+    "GitHub 通知 cron 已配置，但当前只查到一次成功手动执行，定时实际触发仍待核验",
+    "异常提醒、自动备份、账号权限及 CSP 进一步加固",
+    "搜索平台验证与收录提交；不保证搜索引擎最终收录"
+  ]
+}

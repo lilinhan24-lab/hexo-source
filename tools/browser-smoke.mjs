@@ -241,12 +241,8 @@ async function runBrowserChecks() {
     assert(mobileState.scrollWidth <= mobileState.innerWidth + 1, `移动端首页存在横向溢出：${mobileState.scrollWidth}px > ${mobileState.innerWidth}px`)
     assert(mobileState.backgroundImage.includes('banner-glacier.jpg'), '移动端没有使用冰川背景')
     assert(['center center', '50% 50%'].includes(mobileState.backgroundPosition), `移动端冰川背景没有居中：${mobileState.backgroundPosition}`)
-    if (process.env.HAN_PREVIEW === '1') {
-      assert(mobileState.headerHeight >= 380 && mobileState.headerHeight <= 440, `预览移动端背景高度异常：${mobileState.headerHeight}`)
-      assert(await mobilePage.locator('#recent-posts .content').first().evaluate(el => el.getBoundingClientRect().top < innerHeight - 50), '预览首屏仍看不到文章摘要')
-    } else {
-      assert(mobileState.headerHeight >= 480, `移动端首屏高度不足 480px：${mobileState.headerHeight}px`)
-    }
+    assert(mobileState.headerHeight >= 380 && mobileState.headerHeight <= 440, `移动端背景高度异常：${mobileState.headerHeight}`)
+    assert(await mobilePage.locator('#recent-posts .content').first().evaluate(el => el.getBoundingClientRect().top < innerHeight - 50), '移动端首屏仍看不到文章摘要')
     assert(await mobilePage.locator('#sidebar-menus .site-data').count() === 0, '手机菜单仍包含文章、标签或分类数字')
     const mobileNavText = (await mobilePage.locator('#sidebar-menus .menus_item > a.site-page').allInnerTexts()).map(text => text.trim())
     assert(JSON.stringify(mobileNavText) === JSON.stringify(['首页', '文章', '文章分类', '关于', '说说']), `手机导航不正确：${mobileNavText.join(' / ')}`)
@@ -355,13 +351,11 @@ async function checkPowerArticle(page, viewportName) {
   assert((await page.locator('meta[name="description"]').getAttribute('content')).includes('从实验电路的供电需求出发'), '电源文章描述不正确')
   assert((await page.locator('meta[name="keywords"]').getAttribute('content')).includes('LM2596'), '电源文章缺少关键词')
   const images = page.locator('#article-container img')
-  if (process.env.HAN_PREVIEW === '1') {
-    assert((await page.locator('meta[property="og:image"]').getAttribute('content')).includes('assembled-board'), '分享图仍使用头像')
-    assert(await page.locator('#article-container img[srcset]').count() === 3, '三张实拍照片缺少响应式版本')
-    assert(await page.locator('#article-container a.han-original-image').count() === 6, '正文图片缺少查看原图入口')
-    if (viewportName === 'mobile') {
-      assert(await page.locator('#article-container').evaluate(el => parseFloat(getComputedStyle(el).fontSize)) === 16, '手机正文不是 16px')
-    }
+  assert((await page.locator('meta[property="og:image"]').getAttribute('content')).includes('assembled-board'), '分享图仍使用头像')
+  assert(await page.locator('#article-container img[srcset]').count() === 3, '三张实拍照片缺少响应式版本')
+  assert(await page.locator('#article-container a.han-original-image').count() === 6, '正文图片缺少查看原图入口')
+  if (viewportName === 'mobile') {
+    assert(await page.locator('#article-container').evaluate(el => parseFloat(getComputedStyle(el).fontSize)) === 16, '手机正文不是 16px')
   }
   assert(await images.count() === 6, '电源文章图片数量不正确')
   for (const img of await images.all()) {
