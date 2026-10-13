@@ -9,7 +9,11 @@ async function main() {
   if (!process.env.BREVO_API_KEY) throw new Error('缺少发信密钥')
   const request = async (route, method = 'GET', body) => {
     const response = await fetch(`https://api.brevo.com/v3${route}`, { method, redirect:'error', signal:AbortSignal.timeout(30000), headers:{'api-key':process.env.BREVO_API_KEY,'content-type':'application/json'},body:body===undefined?undefined:JSON.stringify(body) })
-    if (!response.ok) throw new Error(`验收服务返回 HTTP ${response.status}`)
+    if (!response.ok) {
+      const resource = route.startsWith('/contacts/lists') ? '名单' : route.startsWith('/contacts/') ? '联系人' : '邮件活动'
+      console.error(JSON.stringify({ resource, httpStatus: response.status }))
+      throw new Error(`验收服务返回 HTTP ${response.status}`)
+    }
     return response.status===204?undefined:response.json()
   }
   const response = await fetch('https://www.han.tax/email-notifications.json',{redirect:'error',signal:AbortSignal.timeout(15000)})
