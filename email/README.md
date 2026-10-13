@@ -7,6 +7,7 @@
 - `email/config.json` 的 `paused: true` 在联网前阻止正式通知、测试与验收发送；本地 dry-run 仍可使用。
 - GitHub variables `HAN_EMAIL_SEND_ENABLED`、`HAN_EMAIL_TEST_ENABLED` 均为 `false`；`email-notifications.yml`、`email-acceptance.yml` 均已在 GitHub 停用。
 - 网站订阅页显示暂停说明，不加载或链接订阅表单；文章不再插入订阅邀请。
+- 服务商旧表单直链尚未停用：已检查表单列表、分享和高级设置，未找到可逆停用开关。保留原表单及双重确认；持有旧直链的人仍可能触发确认邮件。未删除表单、改成免确认订阅或停用共享默认模板，不能承诺确认邮件绝对零消耗。
 - 不撤销 Brevo 密钥，不删除名单或联系人，不改变退订状态，不影响其他项目使用服务商。文章发布、评论和备份照常运行。
 - QQ 验收暂停，不再要求用户重新订阅；历史 404 未解决，不能记为验收成功。
 
