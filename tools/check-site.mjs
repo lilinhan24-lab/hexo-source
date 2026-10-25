@@ -224,7 +224,7 @@ for (const tag of powerHtml.match(/<img\b[^>]*\bsrc=["']\/images\/posts\/[^>]*>/
 }
 if (!powerHtml.includes(powerPostTitle)) problems.push('电源文章标题不正确')
 if (!powerHtml.includes('id="前言"')) problems.push('电源文章缺少“前言”锚点')
-if ((powerHtml.match(/<h2\b/g) || []).length !== 11) problems.push('电源文章二级标题数量不正确')
+if ((powerHtml.match(/<h2\b/g) || []).length !== 12) problems.push('电源文章二级标题数量不正确')
 if (!powerHtml.includes('id="post-comment"')) problems.push('电源文章没有开启评论')
 if ((powerHtml.match(/class="han-equation"/g) || []).length !== 12) problems.push('电源文章公式没有完整渲染')
 if (!powerHtml.includes(`/vendor/katex/${katex.version}/katex.min.css`)) problems.push('公式缺少本地样式')

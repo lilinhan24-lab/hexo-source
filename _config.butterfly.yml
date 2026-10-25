@@ -188,9 +188,9 @@ toc:
   post: true
   page: false
   number: true
-  expand: true
+  expand: false
   # Only for post
-  style_simple: false
+  style_simple: true
   scroll_percent: true
 
 post_copyright:
@@ -393,14 +393,14 @@ rightside_scroll_percent: false
 # Choose: readmode,translate,darkmode,hideAside,toc,chat,comment
 # Don't repeat the same value
 rightside_item_order:
-  enable: false
+  enable: true
   # Default: readmode,translate,darkmode,hideAside
-  hide:
+  hide: readmode,darkmode,hideAside,comment
   # Default: toc,chat,comment
-  show:
+  show: toc
 
 # Animation for the bottom right config button
-rightside_config_animation: true
+rightside_config_animation: false
 
 # --------------------------------------
 # Global Settings
@@ -1054,9 +1054,9 @@ inject:
     - '<link rel="preload" href="/img/banner-glacier.jpg" as="image" fetchpriority="high">'
     - '<link rel="alternate" href="/atom.xml" title="小小林的个人博客" type="application/atom+xml">'
     - <link rel="stylesheet" href="/css/custom.css?v=20261011-1">
-    - <link rel="stylesheet" href="/css/site-optimization.css?v=20261014-1">
+    - <link rel="stylesheet" href="/css/site-optimization.css?v=20261025-1">
   bottom:
-    - <script src="/js/site-enhancements.js?v=20261011-2" defer></script>
+    - <script src="/js/site-enhancements.js?v=20261025-1" defer></script>
 
 # CDN Settings
 # Don't modify the following settings unless you know how they work
