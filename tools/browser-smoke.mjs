@@ -126,10 +126,10 @@ async function runBrowserChecks() {
     if (process.env.HAN_PREVIEW === '1') {
       assert(await page.locator('#footer a[href="/atom.xml"]').count() === 1, '预览缺少可见 RSS 入口')
     }
-    assert(await page.locator('#recent-posts .recent-post-item').count() === 2, '首页应有两张文章卡片')
-    assert(await page.locator('#recent-posts .article-title').first().innerText() === powerPostTitle, '最新文章卡片标题不正确')
+    assert(await page.locator('#recent-posts .recent-post-item').count() === 3, '首页应有三张文章卡片')
+    assert(await page.locator('#recent-posts .article-title').first().innerText() === 'AC/DC 输入可调电源板：LM317 稳压与 LM339 四级电压指示', '最新文章卡片标题不正确')
     assert((await page.locator('#recent-posts').innerText()).includes(welcomePostTitle), '首页缺少开篇文章')
-    assert((await page.locator('#recent-posts .content').first().innerText()).includes('从实验电路的供电需求出发'), '电源文章摘要不正确')
+    assert((await page.locator('#recent-posts .content').first().innerText()).includes('从个人学习与电源设计实践出发'), '电源文章摘要不正确')
     assert(await page.locator('.card-recent-post').count() === 1, '最近文章侧栏卡片没有恢复')
     assert((await page.locator('.card-recent-post').innerText()).includes(welcomePostTitle), '最近文章卡片缺少首篇文章')
     assert(await page.locator('a[href*="github.com/lilinhan24-lab"]').count() === 0, '首页仍显示个人 GitHub 入口')

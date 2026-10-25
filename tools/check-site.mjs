@@ -123,7 +123,7 @@ if (!await exists(draftTemplate)) problems.push('草稿模板已丢失: source/_
 
 const postFiles = (await walk(path.join(sourceRoot, '_posts'))).filter(file => /\.md$/i.test(file))
 const expectedPostSource = path.join(sourceRoot, '_posts', 'welcome-and-roadmap.md')
-const expectedPostSources = [expectedPostSource, path.join(sourceRoot, '_posts', 'lm2596-ams1117-design.md')]
+const expectedPostSources = [expectedPostSource, path.join(sourceRoot, '_posts', 'lm2596-ams1117-design.md'), path.join(sourceRoot, '_posts', 'lm317-ac-dc-adjustable-supply.md')]
 if (postFiles.length !== expectedPostSources.length || expectedPostSources.some(file => !postFiles.includes(file))) {
   problems.push(`正式文章清单不符，实际为: ${postFiles.map(file => path.relative(projectRoot, file)).join(', ') || '无'}`)
 }
