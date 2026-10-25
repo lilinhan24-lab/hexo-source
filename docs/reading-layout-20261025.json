@@ -18,8 +18,17 @@
   ],
   "verification": {
     "automated": "npm test / npm run check / npm run test:browser",
+    "unit_tests_passed": 54,
+    "production_browser_regression": "通过；www.han.tax 已确认新首页、速览与暂停订阅，两个邮件工作流仍 disabled_manually",
     "viewports": [320, 390, 768, 1440],
     "evidence_directory": "artifacts/reading-layout-20261025",
-    "not_verified": ["实体 Android 触控", "限速首次加载性能", "新增电路或板上测试"]
+    "not_verified": ["实体 Android 触控", "限速首次加载性能", "新增电路或板上测试"],
+    "security_audit": {
+      "status": "未通过，不声称全部检查通过",
+      "dependency": "hexo-renderer-marked 引入的 dompurify",
+      "report": "2026-10-25 npm audit --omit=dev --audit-level=critical 报告 2 项 critical，显示 No fix available",
+      "action": "本次未修改依赖版本，未禁用审计；保留告警，修复或更换渲染依赖需单独验证文章与公式兼容性。",
+      "advisories": ["GHSA-cg2g-xh64-v4q7", "GHSA-mrv2-3pqr-j5jr", "GHSA-c6gr-qvv4-5v3f"]
+    }
   }
 }
