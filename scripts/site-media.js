@@ -25,7 +25,7 @@ hexo.extend.generator.register('responsive-photos', async () => {
 })
 
 hexo.extend.filter.register('after_render:html', html => {
-  if (html.includes('id="post"') || html.includes('id="han-featured-project"')) html = enhanceArticle(html, variants)
+  if (html.includes('id="post"')) html = enhanceArticle(html, variants)
   if (/<link[^>]+rel="canonical"[^>]+href="https:\/\/www\.han\.tax\/posts\/lm2596-ams1117-design\/"/.test(html)) {
     html = setShareImage(html, 'https://www.han.tax/images/posts/lm2596-ams1117-design/assembled-board.jpg')
   }

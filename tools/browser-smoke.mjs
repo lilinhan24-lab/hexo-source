@@ -118,9 +118,7 @@ async function runBrowserChecks() {
     assert((await page.locator('.card-info').innerText()).includes('专注开关电源设计、调试与实测'), '作者卡片丢失已确认的开关电源定位')
     assert(await page.locator('#footer a[href="/subscribe/"]').count() === 1, '页脚缺少邮件订阅入口')
     assert(await page.locator('a[href$="/atom.xml"]').count() === 0, '不向普通访客展示 XML 入口')
-    assert(await page.locator('#site-title').innerText() === '硬件小小林 · 电源设计与实测', '首页主标题不正确')
-    assert(await page.locator('#han-featured-project').count() === 1, '首页缺少精选项目')
-    assert((await page.locator('#han-featured-project').innerText()).includes('两路分别约 0.8 A'), '精选项目没有保留分别测试边界')
+    assert(await page.locator('#site-title').innerText() === '小小林的个人博客', '首页主标题不正确')
     assert(await page.locator('.author-info-name').innerText() === '硬件小小林', '侧栏作者名不正确')
     assert(await page.locator('.han-motto').innerText() === '逆水行舟，不进则退', '侧栏座右铭不正确')
     assert(await page.locator('.han-motto').isVisible(), '侧栏座右铭不可见')
@@ -134,7 +132,6 @@ async function runBrowserChecks() {
     assert((await page.locator('#recent-posts .content').first().innerText()).includes('从实验电路的供电需求出发'), '电源文章摘要不正确')
     assert(await page.locator('.card-recent-post').count() === 1, '最近文章侧栏卡片没有恢复')
     assert((await page.locator('.card-recent-post').innerText()).includes(welcomePostTitle), '最近文章卡片缺少首篇文章')
-    assert(!await page.locator('.card-recent-post').isVisible(), '首页仍显示重复的最新文章侧栏')
     assert(await page.locator('a[href*="github.com/lilinhan24-lab"]').count() === 0, '首页仍显示个人 GitHub 入口')
     assert(await page.locator('#aside-content .card-info .site-data').count() === 0, '作者卡片仍包含文章、标签或分类数字')
     assert(await page.locator('.card-categories, .card-tags, .card-archives, .card-webinfo').count() === 0, '首页仍显示暂未启用的侧栏卡片')
@@ -223,8 +220,7 @@ async function runBrowserChecks() {
     const aboutText = await page.locator('#article-container').innerText()
     assert(aboutText.includes('你好，我是硬件小小林'), '关于页缺少新身份介绍')
     assert(aboutText.includes('座右铭： 逆水行舟，不进则退。'), `关于页座右铭不正确：${aboutText}`)
-    assert(!aboutText.includes('函的极客笔记') && !aboutText.includes('PT100'), '关于页仍包含旧品牌或旧文章')
-    assert(await page.locator('#article-container a[href="/posts/lm2596-ams1117-design/"]').count() === 1, '关于页缺少代表项目入口')
+    assert(!aboutText.includes('函的极客笔记') && !aboutText.includes('PT100') && !aboutText.includes('LM2596'), '关于页仍包含旧品牌或旧文章')
     assert(await page.locator('a[href*="github.com/lilinhan24-lab"]').count() === 0, '关于页仍显示个人 GitHub 入口')
     if (screenshotDirectory) await page.screenshot({ path: path.join(screenshotDirectory, 'han-tax-about.png'), fullPage: true })
 
@@ -246,15 +242,7 @@ async function runBrowserChecks() {
     assert(mobileState.backgroundImage.includes('banner-glacier.jpg'), '移动端没有使用冰川背景')
     assert(['center center', '50% 50%'].includes(mobileState.backgroundPosition), `移动端冰川背景没有居中：${mobileState.backgroundPosition}`)
     assert(mobileState.headerHeight >= 380 && mobileState.headerHeight <= 440, `移动端背景高度异常：${mobileState.headerHeight}`)
-    assert(await mobilePage.locator('#han-featured-title').evaluate(el => el.getBoundingClientRect().top < innerHeight - 50), '移动端首屏看不到精选项目标题')
-    assert(await mobilePage.locator('button#toggle-menu').count() === 1, '手机菜单不是原生按钮')
-    await mobilePage.locator('#toggle-menu').focus()
-    await mobilePage.keyboard.press('Enter')
-    await mobilePage.waitForFunction(() => document.querySelector('#toggle-menu').getAttribute('aria-expanded') === 'true')
-    await mobilePage.keyboard.press('Escape')
-    await mobilePage.waitForFunction(() => document.querySelector('#toggle-menu').getAttribute('aria-expanded') === 'false')
-    await mobilePage.locator('#menu-mask').waitFor({ state: 'hidden' })
-    assert(await mobilePage.locator('#toggle-menu').evaluate(el => document.activeElement === el), '关闭菜单后焦点未返回')
+    assert(await mobilePage.locator('#recent-posts .content').first().evaluate(el => el.getBoundingClientRect().top < innerHeight - 50), '移动端首屏仍看不到文章摘要')
     assert(await mobilePage.locator('#sidebar-menus .site-data').count() === 0, '手机菜单仍包含文章、标签或分类数字')
     const mobileNavText = (await mobilePage.locator('#sidebar-menus .menus_item > a.site-page').allInnerTexts()).map(text => text.trim())
     assert(JSON.stringify(mobileNavText) === JSON.stringify(['首页', '文章', '文章分类', '关于', '说说']), `手机导航不正确：${mobileNavText.join(' / ')}`)
@@ -350,10 +338,9 @@ async function checkPowerArticle(page, viewportName) {
   assert(titleState.clamp === 'none' && !titleState.clipped && titleState.top >= 60 && titleState.bottom <= titleState.headerBottom, `文章标题被截断或超出标题区：${JSON.stringify(titleState)}`)
   assert(await page.locator('#article-container h1').count() === 0, '电源文章正文重复了主标题')
   assert(await page.locator('#article-container h2').first().innerText() === '前言', '前言标题不是两个字')
-  assert(await page.locator('#article-container h2').count() === 12, '电源文章章节数量不正确')
-  assert(await page.locator('.han-project-summary').count() === 1, '电源文章缺少结果速览')
+  assert(await page.locator('#article-container h2').count() === 11, '电源文章章节数量不正确')
   const openingSpace = await page.locator('#article-container > h2').first().evaluate(el => ({
-    gap: el.getBoundingClientRect().top - document.querySelector('.han-project-summary').getBoundingClientRect().bottom,
+    gap: el.getBoundingClientRect().top - document.querySelector('#post').getBoundingClientRect().top,
     margin: parseFloat(getComputedStyle(el).marginTop),
     padding: parseFloat(getComputedStyle(el).paddingTop),
     border: parseFloat(getComputedStyle(el).borderTopWidth)
@@ -404,7 +391,7 @@ async function checkPowerArticle(page, viewportName) {
         return rgb[0] * 0.2126 + rgb[1] * 0.7152 + rgb[2] * 0.0722
       }
       const bg = luminance(getComputedStyle(document.querySelector('#post')).backgroundColor)
-      return [...document.querySelectorAll('#article-container .img-alt, #article-container a[href^="http"], .han-project-summary nav a, #card-toc .toc-percentage')].filter(el => {
+      return [...document.querySelectorAll('#article-container .img-alt, #article-container a[href^="http"]')].filter(el => {
         const fg = luminance(getComputedStyle(el).color)
         return (Math.max(bg, fg) + 0.05) / (Math.min(bg, fg) + 0.05) < 4.5
       }).map(el => el.textContent.slice(0, 50))
@@ -439,35 +426,8 @@ async function checkPowerArticle(page, viewportName) {
   }
   if (screenshotDirectory) {
     await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }))
-    await page.evaluate(async () => { await Promise.all(document.getAnimations().filter(a => a instanceof CSSTransition).map(a => a.finished.catch(() => {}))) })
     await page.screenshot({ path: path.join(screenshotDirectory, `han-tax-power-${viewportName}-opening.png`) })
     await page.screenshot({ path: path.join(screenshotDirectory, `han-tax-power-${viewportName}.png`), fullPage: true })
-  }
-  if (viewportName === 'mobile') {
-    for (const width of [320, 390, 768]) {
-      await page.setViewportSize({ width, height: 844 })
-      const table = page.locator('#article-container .table-wrap').nth(1)
-      await table.evaluate(el => { el.scrollIntoView({ block: 'center', behavior: 'instant' }); el.scrollLeft = el.scrollWidth })
-      await page.waitForFunction(() => document.querySelector('#rightside').classList.contains('rightside-show'))
-      await page.waitForFunction(() => getComputedStyle(document.querySelector('#rightside')).opacity === '1')
-      const metrics = await table.evaluate(el => {
-        const cell = el.querySelector('tbody tr:last-child td:last-child')
-        const box = cell.getBoundingClientRect()
-        const bar = document.querySelector('#rightside').getBoundingClientRect()
-        return { overflow: document.documentElement.scrollWidth > innerWidth + 1, lastValue: cell.textContent.trim(), cellRight: box.right, tableRight: el.getBoundingClientRect().right, noWrap: getComputedStyle(cell).whiteSpace === 'nowrap', barTop: bar.top, cellBottom: box.bottom }
-      })
-      assert(!metrics.overflow && metrics.noWrap && metrics.lastValue === '2.59' && metrics.cellRight <= metrics.tableRight + 1 && metrics.cellBottom < metrics.barTop, `${width}px 表格或工具条遮挡：${JSON.stringify(metrics)}`)
-      if (screenshotDirectory) await page.screenshot({ path: path.join(screenshotDirectory, `han-tax-load-table-${width}.png`) })
-    }
-    await page.setViewportSize({ width: 390, height: 844 })
-    await page.locator('#mobile-toc-button').click()
-    assert(await page.locator('#card-toc').evaluate(el => el.classList.contains('open')), '手机目录无法打开')
-    await page.locator('#card-toc a').filter({ hasText: '输出纹波测试' }).click()
-    await page.waitForFunction(() => Math.abs(document.getElementById('输出纹波测试').getBoundingClientRect().top) < 160)
-    await page.locator('#rightside-config').click()
-    await page.locator('#rightside-config-hide.show').waitFor({ state: 'visible' })
-    assert(await page.locator('#to_comment').isVisible() && await page.locator('#darkmode').isVisible(), '设置内评论或夜间模式入口丢失')
-    await page.locator('#rightside-config').click()
   }
 }
 

@@ -2,35 +2,6 @@
   const interactiveSelector = 'input, textarea, select, button, [contenteditable="true"]'
 
   const enhancePage = () => {
-    const menuButton = document.getElementById('toggle-menu')
-    const menuPanel = document.getElementById('sidebar-menus')
-    if (menuButton && menuPanel && !menuButton.dataset.stateReady) {
-      menuButton.dataset.stateReady = 'true'
-      const syncMenu = () => {
-        const open = menuPanel.classList.contains('open')
-        menuButton.setAttribute('aria-expanded', String(open))
-        menuButton.setAttribute('aria-label', open ? '关闭主导航' : '打开主导航')
-        if (open) menuPanel.querySelector('.menus_item a')?.focus({ preventScroll: true })
-        else if (menuPanel.contains(document.activeElement)) menuButton.focus({ preventScroll: true })
-      }
-      new MutationObserver(syncMenu).observe(menuPanel, { attributes: true, attributeFilter: ['class'] })
-      syncMenu()
-      menuPanel.addEventListener('keydown', event => {
-        if (event.key === 'Escape') {
-          document.getElementById('menu-mask')?.click()
-          menuButton.focus()
-        }
-      })
-    }
-    document.querySelectorAll('#article-container .table-wrap').forEach((wrap, index) => {
-      wrap.tabIndex = 0
-      wrap.setAttribute('role', 'region')
-      wrap.setAttribute('aria-label', `数据表 ${index + 1}，宽表可左右滚动`)
-      if (!wrap.dataset.scrollReady) {
-        wrap.dataset.scrollReady = 'true'
-        new ResizeObserver(() => { wrap.dataset.scrollable = String(wrap.scrollWidth > wrap.clientWidth + 1) }).observe(wrap)
-      }
-    })
     const main = document.getElementById('content-inner') || document.querySelector('main')
     if (main) {
       if (!main.id) main.id = 'main-content'
@@ -87,11 +58,6 @@
   }
 
   document.addEventListener('keydown', event => {
-    if (event.key === 'Escape' && document.querySelector('#sidebar-menus.open')) {
-      document.getElementById('menu-mask')?.click()
-      document.getElementById('toggle-menu')?.focus()
-      return
-    }
     if (!(event.ctrlKey || event.metaKey) || event.altKey || event.key.toLowerCase() !== 'k') return
     if (event.target.closest(interactiveSelector)) return
 
@@ -122,6 +88,4 @@
   }
 
   window.addEventListener('pjax:complete', enhancePage)
-  // Butterfly creates table wrappers during DOMContentLoaded, after deferred scripts.
-  window.addEventListener('load', enhancePage, { once: true })
 })()
